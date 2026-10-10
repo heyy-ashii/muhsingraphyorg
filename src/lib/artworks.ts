@@ -1,5 +1,5 @@
 import { SEED_ARTWORKS } from "./seed";
-import { getSupabaseServerClient } from "./supabase/server";
+import { createSupabaseContext } from "./supabase/context";
 import { isSupabaseConfigured } from "./supabase/config";
 import type { Artwork } from "./types";
 
@@ -14,10 +14,10 @@ export async function getArtworks(): Promise<Artwork[]> {
   if (!isSupabaseConfigured) return [...SEED_ARTWORKS].sort(byOrder);
 
   try {
-    const supabase = await getSupabaseServerClient();
-    if (!supabase) return [...SEED_ARTWORKS].sort(byOrder);
+    const { data: ctx } = await createSupabaseContext({ auth: "none" });
+    if (!ctx) return [...SEED_ARTWORKS].sort(byOrder);
 
-    const { data, error } = await supabase
+    const { data, error } = await ctx.supabase
       .from("artworks")
       .select("*")
       .order("display_order", { ascending: true });
@@ -38,10 +38,10 @@ export async function getArtworkById(id: string): Promise<Artwork | null> {
   if (!isSupabaseConfigured) return SEED_ARTWORKS.find((w) => w.id === id) ?? null;
 
   try {
-    const supabase = await getSupabaseServerClient();
-    if (!supabase) return SEED_ARTWORKS.find((w) => w.id === id) ?? null;
+    const { data: ctx } = await createSupabaseContext({ auth: "none" });
+    if (!ctx) return SEED_ARTWORKS.find((w) => w.id === id) ?? null;
 
-    const { data, error } = await supabase.from("artworks").select("*").eq("id", id).maybeSingle();
+    const { data, error } = await ctx.supabase.from("artworks").select("*").eq("id", id).maybeSingle();
     if (error || !data) return SEED_ARTWORKS.find((w) => w.id === id) ?? null;
     return data as Artwork;
   } catch {

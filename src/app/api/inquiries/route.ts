@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseContext } from "@/lib/supabase/context";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { SEED_INQUIRIES } from "@/lib/seed";
 import { COMMISSION_TYPES } from "@/lib/types";
@@ -72,12 +72,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    const supabase = await getSupabaseServerClient();
-    if (!supabase) throw new Error("client unavailable");
+    // Collectors are anonymous: `auth: 'none'` yields an RLS-scoped client whose
+    // insert is permitted by the "inquiries public insert" policy.
+    const { data: ctx, error } = await createSupabaseContext({ auth: "none" });
+    if (error || !ctx) throw new Error(error?.message ?? "client unavailable");
 
-    const { error } = await supabase.from("inquiries").insert(record);
-    if (error) {
-      console.error("[inquiries] insert failed", error.message);
+    const { error: insertError } = await ctx.supabase.from("inquiries").insert(record);
+    if (insertError) {
+      console.error("[inquiries] insert failed", insertError.message);
       return NextResponse.json({ error: "We could not record your enquiry. Please try again." }, { status: 500 });
     }
 

@@ -30,7 +30,40 @@ portal reports that it is not yet connected instead of erroring.
 3. Optionally run [`supabase/seed.sql`](supabase/seed.sql) to load the archive.
 4. Under **Authentication → Users**, add the artist's email and password. There
    is no sign-up flow — the curator account is created here.
-5. Copy the project URL and anon key into `.env.local`.
+5. Copy the project URL, publishable key and secret key into `.env.local`
+   (see [`.env.example`](.env.example)).
+
+### How the auth stack fits together
+
+The server side composes two Supabase packages, following the pattern in
+[`@supabase/server`'s SSR guide](https://github.com/supabase/server):
+
+- **`@supabase/ssr`** owns the cookie session lifecycle. `src/middleware.ts`
+  refreshes the rotating access-token cookie on every `/admin` request, because
+  Server Components cannot write cookies.
+- **`@supabase/server`** provides the primitives on top:
+  `verifyCredentials` cryptographically verifies the session JWT against the
+  project JWKS, `createContextClient` builds an RLS-scoped client bound to that
+  verified token, and `createAdminClient` builds a service-role client.
+
+They are wired together in [`src/lib/supabase/context.ts`](src/lib/supabase/context.ts),
+which returns the same `{ supabase, supabaseAdmin, userClaims }` bundle the
+high-level `withSupabase` wrapper exposes:
+
+| Call | Client | Used by |
+| --- | --- | --- |
+| `createSupabaseContext({ auth: 'user' })` | RLS as the signed-in curator | `/admin/dashboard` gate |
+| `createSupabaseContext({ auth: 'none' })` | RLS as `anon` | public artwork reads, enquiry inserts |
+
+`@supabase/server` does not replace `@supabase/ssr` in cookie-based frameworks —
+the two coexist, as its documentation states. The high-level `withSupabase` /
+`createSupabaseContext` wrappers from the package are designed for header-based
+auth (Edge Functions, Workers) and are not used here.
+
+Environment variables are bridged in
+[`src/lib/supabase/env.ts`](src/lib/supabase/env.ts), which is guarded by
+`server-only` so the secret key cannot reach the browser. JWKS is derived from
+the project URL automatically.
 
 ### Row-level security model
 
@@ -79,7 +112,7 @@ src/
     ui/           brand marks, theme toggle, motion primitives, WhatsApp button
     admin/        login form, dashboard, artwork drawer
   lib/            types, site config, whatsapp, supabase clients, admin API
-  middleware.ts   refreshes the session and gates /admin
+  middleware.ts   refreshes the @supabase/ssr session and gates /admin
 supabase/
   schema.sql      tables, RLS policies, storage bucket
   seed.sql        archive seed

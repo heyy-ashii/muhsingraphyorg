@@ -46,6 +46,21 @@ done
   `isSupabaseConfigured` is false: public reads fall back to `src/lib/seed.ts`
   and the admin portal shows a configuration notice instead of throwing. Any new
   data access must preserve this fallback.
+- **Server Supabase access goes through `src/lib/supabase/context.ts`.** It
+  composes `@supabase/ssr` (cookie session lifecycle, refreshed in
+  `src/middleware.ts`) with `@supabase/server` core primitives
+  (`verifyCredentials` → `createContextClient` / `createAdminClient`). Use
+  `createSupabaseContext({ auth: 'user' })` for curator-only access and
+  `{ auth: 'none' }` for anonymous RLS access. Do not add a second ad-hoc
+  server client.
+- **`@supabase/server`'s high-level `withSupabase` / `createSupabaseContext`
+  wrappers are intentionally NOT used** — they target header-based auth (Edge
+  Functions, Workers), not Next's cookie sessions. `@supabase/server` does not
+  replace `@supabase/ssr` in Next.js; the two coexist.
+- **The secret key must never reach the client.** `SUPABASE_SECRET_KEY` is read
+  only in `src/lib/supabase/env.ts`, which imports `server-only`. Keep
+  `src/lib/supabase/config.ts` free of non-`NEXT_PUBLIC_` env reads — putting one
+  there leaks a `process.env` reference into the browser bundle.
 - **`@/lib/whatsapp.ts` is the single source of truth** for the acquisition
   message + `wa.me` link. Never hand-build a WhatsApp URL elsewhere.
 - **Admin is gated twice**: `src/middleware.ts` (session refresh + redirect) and

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseContext } from "@/lib/supabase/context";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { DashboardClient } from "@/components/admin/dashboard-client";
 
@@ -11,17 +11,12 @@ export const metadata: Metadata = {
 
 export default async function DashboardPage() {
   if (isSupabaseConfigured) {
-    const supabase = await getSupabaseServerClient();
-    const {
-      data: { user },
-    } = (await supabase?.auth.getUser()) ?? { data: { user: null } };
-    if (!user) redirect("/admin/login?next=/admin/dashboard");
+    // `auth: 'user'` verifies the session JWT against JWKS before the dashboard
+    // renders; middleware has already refreshed the cookie.
+    const { data: ctx, error } = await createSupabaseContext({ auth: "user" });
+    if (error || !ctx?.userClaims) redirect("/admin/login?next=/admin/dashboard");
+    return <DashboardClient email={ctx.userClaims.email ?? "curator@muhsingraphy.com"} />;
   }
 
-  const supabase = await getSupabaseServerClient();
-  const {
-    data: { user },
-  } = (await supabase?.auth.getUser()) ?? { data: { user: null } };
-
-  return <DashboardClient email={user?.email ?? "preview@muhsingraphy.com"} />;
+  return <DashboardClient email="preview@muhsingraphy.com" />;
 }
