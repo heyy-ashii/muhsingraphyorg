@@ -40,6 +40,18 @@ done
    LoaderCircle`, `Trash2 → Trash`. Brand glyphs live as inline SVGs in
    `src/components/ui/whatsapp-button.tsx`.
 
+## Provisioning state
+
+- Supabase project ref `yiflgzshrtzenndcvyvv` is provisioned: `schema.sql` applied
+  (both tables, RLS policies, `artwork-media` bucket) and `seed.sql` loaded
+  (6 artworks). Verified: anon insert into `artworks` → 401, anon delete is a
+  no-op, unpublished rows are hidden from `anon`.
+- The curator account is created out-of-band with
+  `node scripts/create-curator.mjs <email> <password>` (needs
+  `SUPABASE_SECRET_KEY`). It is idempotent — re-running resets the password.
+- Schema changes need the Management API (`sbp_…` token,
+  `POST /v1/projects/{ref}/database/query`). The service-role key cannot run SQL.
+
 ## Architecture conventions
 
 - **Supabase-optional by design.** When `NEXT_PUBLIC_SUPABASE_*` are unset,
