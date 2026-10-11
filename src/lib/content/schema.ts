@@ -111,9 +111,19 @@ export interface ContactCopy {
   country: string;
 }
 
+/** Attribution for the site's builder, shown in the footer. */
+export interface CreditCopy {
+  label: string;
+  name: string;
+  instagram: string;
+  phone: string;
+  phoneDisplay: string;
+}
+
 export interface SiteContent {
   brand: BrandCopy;
   contact: ContactCopy;
+  credit: CreditCopy;
   nav: NavItem[];
   visibility: Record<SectionKey, boolean>;
   hero: HeroCopy;

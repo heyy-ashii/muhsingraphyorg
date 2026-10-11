@@ -109,7 +109,7 @@ export function ContentEditor({
         </Panel>
 
         {/* ── Contact & studio ─────────────────────────────── */}
-        <Panel title="Contact & studio" description="WhatsApp, email, Instagram and studio details.">
+        <Panel title="Contact & studio" description="WhatsApp, email, Instagram, studio details and the site credit.">
           <Grid>
             <Text label="WhatsApp number (digits only)" value={draft.contact.whatsappNumber} onChange={(v) => apply(edit(draft, (d) => void (d.contact.whatsappNumber = v.replace(/[^0-9]/g, ""))))} />
             <Text label="WhatsApp display" value={draft.contact.whatsappDisplay} onChange={(v) => apply(edit(draft, (d) => void (d.contact.whatsappDisplay = v)))} />
@@ -120,6 +120,14 @@ export function ContentEditor({
             <Text label="Studio line 2" value={draft.contact.studioLine2} onChange={(v) => apply(edit(draft, (d) => void (d.contact.studioLine2 = v)))} />
             <Text label="City" value={draft.contact.city} onChange={(v) => apply(edit(draft, (d) => void (d.contact.city = v)))} />
             <Text label="Country" value={draft.contact.country} onChange={(v) => apply(edit(draft, (d) => void (d.contact.country = v)))} />
+          </Grid>
+          <p className="eyebrow pt-2">Site credit (footer)</p>
+          <Grid>
+            <Text label="Credit label" value={draft.credit.label} onChange={(v) => apply(edit(draft, (d) => void (d.credit.label = v)))} />
+            <Text label="Credit name" value={draft.credit.name} onChange={(v) => apply(edit(draft, (d) => void (d.credit.name = v)))} />
+            <Text label="Credit Instagram URL" value={draft.credit.instagram} onChange={(v) => apply(edit(draft, (d) => void (d.credit.instagram = v)))} />
+            <Text label="Credit phone (digits only)" value={draft.credit.phone} onChange={(v) => apply(edit(draft, (d) => void (d.credit.phone = v.replace(/[^0-9]/g, ""))))} />
+            <Text label="Credit phone display" value={draft.credit.phoneDisplay} onChange={(v) => apply(edit(draft, (d) => void (d.credit.phoneDisplay = v)))} />
           </Grid>
         </Panel>
 

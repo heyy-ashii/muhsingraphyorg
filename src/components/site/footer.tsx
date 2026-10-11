@@ -7,7 +7,7 @@ import { BrandLockup } from "@/components/ui/brand-lockup";
 import { BrandMark } from "@/components/ui/brand-mark";
 
 export function Footer() {
-  const { brand, contact, nav } = useSiteContent();
+  const { brand, contact, credit, nav } = useSiteContent();
 
   const toTop = () => {
     const lenis = (window as unknown as { __lenis?: { scrollTo: (t: number, o?: object) => void } }).__lenis;
@@ -98,6 +98,25 @@ export function Footer() {
         <div className="flex flex-col items-center justify-between gap-6 py-8 sm:flex-row">
           <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-muted">
             {brand.copyright}
+          </p>
+
+          <p className="order-last text-center font-mono text-[9px] tracking-[0.14em] text-muted/80 sm:order-none">
+            {credit.label}{" "}
+            <a
+              href={credit.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-underline text-ink/70 transition-colors duration-500 hover:text-gold"
+            >
+              {credit.name}
+            </a>
+            <span className="px-1.5 text-muted/50">·</span>
+            <a
+              href={`tel:${credit.phone}`}
+              className="link-underline text-ink/70 transition-colors duration-500 hover:text-gold"
+            >
+              {credit.phoneDisplay}
+            </a>
           </p>
 
           <div className="flex items-center gap-7">
