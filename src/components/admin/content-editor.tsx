@@ -105,7 +105,7 @@ export function ContentEditor({
   const activeGroup = GROUPS.find((g) => g.key === group) ?? GROUPS[0];
 
   return (
-    <div className="pb-28">
+    <div className="lg:flex lg:flex-1 lg:flex-col">
       {tableMissing && (
         <div className="mb-6 flex gap-3 rounded-2xl border border-gold/40 bg-gold/5 px-5 py-4">
           <Info size={18} className="mt-0.5 shrink-0 text-gold-deep dark:text-gold" />
@@ -166,9 +166,9 @@ export function ContentEditor({
         {group === "ticker" && <TickerGroup draft={draft} apply={apply} />}
       </div>
 
-      {/* ── sticky save bar ────────────────────────────────── */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-canvas/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1500px] flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8">
+      {/* ── sticky save bar (pinned to the scrolling content column) ── */}
+      <div className="sticky bottom-0 z-40 -mx-5 mt-8 shrink-0 border-t border-line bg-canvas/90 px-5 py-4 backdrop-blur-xl sm:-mx-8 sm:px-8 lg:mt-auto">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
             {error ? <span className="text-red-500">{error}</span> : dirty ? "Unsaved changes" : "All changes saved"}
           </p>
