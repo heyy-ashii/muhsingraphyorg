@@ -7,7 +7,6 @@ import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
 import type { Artwork } from "@/lib/types";
 import { galleryOf } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { RoomPreview } from "./room-preview";
 
 const LENS = 260;
 const ZOOM = 3;
@@ -15,11 +14,10 @@ const ZOOM = 3;
 /**
  * The full-bleed stage on a piece's own page. Shows every photograph in the
  * gallery — the cover plus the close-ups of different portions and angles —
- * with a thumbnail strip, keyboard arrows, a zoom lens and a view-in-room mode.
+ * with a thumbnail strip, keyboard arrows and a desktop-only zoom lens.
  */
 export function ArtworkDetailViewer({ artwork }: { artwork: Artwork }) {
   const images = galleryOf(artwork);
-  const [view, setView] = useState<"artwork" | "room">("artwork");
   const [index, setIndex] = useState(0);
   const [lensOn, setLensOn] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0, bx: 50, by: 50 });
@@ -59,34 +57,11 @@ export function ArtworkDetailViewer({ artwork }: { artwork: Artwork }) {
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="inline-flex rounded-full border border-line p-0.5">
-          {(["artwork", "room"] as const).map((mode) => (
-            <button
-              key={mode}
-              type="button"
-              onClick={() => {
-                setView(mode);
-                setLensOn(false);
-              }}
-              className={cn(
-                "rounded-full px-4 py-2 font-mono text-[9px] uppercase tracking-[0.2em] transition-colors duration-500",
-                view === mode ? "bg-ink text-canvas" : "text-muted hover:text-ink",
-              )}
-            >
-              {mode === "artwork" ? "Artwork View" : "View in Room"}
-            </button>
-          ))}
-        </div>
-
+      <div className="flex items-center justify-end">
         <button
           type="button"
           onClick={() => setLensOn((v) => !v)}
-          disabled={view === "room"}
-          className={cn(
-            "inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 font-mono text-[9px] uppercase tracking-[0.2em] text-ink transition-colors hover:border-gold/60 hover:text-gold",
-            view === "room" && "cursor-not-allowed opacity-35 hover:border-line hover:text-ink",
-          )}
+          className="hidden items-center gap-2 rounded-full border border-line px-4 py-2 font-mono text-[9px] uppercase tracking-[0.2em] text-ink transition-colors hover:border-gold/60 hover:text-gold md:inline-flex"
         >
           {lensOn ? <Minimize2 size={11} /> : <Maximize2 size={11} />}
           {lensOn ? "Lens on" : "Zoom lens"}
@@ -96,58 +71,35 @@ export function ArtworkDetailViewer({ artwork }: { artwork: Artwork }) {
       <div
         ref={stageRef}
         onMouseMove={onMove}
-        onMouseEnter={() => view === "artwork" && setLensOn(true)}
+        onMouseEnter={() => setLensOn(true)}
         onMouseLeave={() => setLensOn(false)}
         className={cn(
           "relative mt-6 aspect-[4/5] overflow-hidden border border-line bg-[#0b0b0d] sm:aspect-[16/13]",
-          view === "artwork" && lensOn && "cursor-none",
+          lensOn && "md:cursor-none",
         )}
       >
         <AnimatePresence mode="wait">
-          {view === "artwork" ? (
-            <motion.div
-              key={current}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.45 }}
-              className="absolute inset-0"
-            >
-              <Image
-                src={current}
-                alt={`${artwork.title} — ${artwork.script_style} calligraphy by Muhsin (view ${index + 1})`}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 60vw"
-                className="object-cover"
-              />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="room"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              className="absolute inset-0"
-            >
-              {artwork.in_situ_image_url ? (
-                <Image
-                  src={artwork.in_situ_image_url}
-                  alt={`${artwork.title} installed in a collector's interior`}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 60vw"
-                  className="object-cover"
-                />
-              ) : (
-                <RoomPreview src={artwork.image_url} alt={artwork.title} />
-              )}
-            </motion.div>
-          )}
+          <motion.div
+            key={current}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.45 }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={current}
+              alt={`${artwork.title} — ${artwork.script_style} calligraphy by Muhsin (view ${index + 1})`}
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 60vw"
+              className="object-cover"
+            />
+          </motion.div>
         </AnimatePresence>
 
         {/* gallery navigation */}
-        {many && view === "artwork" && (
+        {many && (
           <>
             <button
               type="button"
@@ -172,7 +124,7 @@ export function ArtworkDetailViewer({ artwork }: { artwork: Artwork }) {
         )}
 
         <AnimatePresence>
-          {lensOn && view === "artwork" && (
+          {lensOn && (
             <motion.div
               initial={{ opacity: 0, scale: 0.7 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -206,7 +158,6 @@ export function ArtworkDetailViewer({ artwork }: { artwork: Artwork }) {
               type="button"
               onClick={() => {
                 setIndex(i);
-                setView("artwork");
                 setLensOn(false);
               }}
               aria-label={`Show image ${i + 1} of ${images.length}`}

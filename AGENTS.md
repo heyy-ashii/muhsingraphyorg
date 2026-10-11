@@ -88,6 +88,11 @@ done
   re-inventing status chips. Only one tab panel renders at a time — do not go
   back to the old `tab === "x" ? … : <default>` shape that leaked one panel
   under every other tab.
+- **The dashboard keeps its own light/dark toggle.** It reuses the shared
+  `ThemeToggle` (`src/components/ui/theme-toggle.tsx`) — once in the sidebar
+  ("Appearance") and once in the mobile header. Both drive the same
+  `ThemeProvider` / `mhg-theme` key as the public site, so the choice carries
+  across. Don't drop either control.
 - Design tokens are CSS variables in `src/app/globals.css`, surfaced to Tailwind
   in `tailwind.config.ts`. Use token classes (`text-ink`, `bg-canvas`,
   `border-line`, `text-gold`) rather than raw hex.
@@ -114,6 +119,13 @@ done
   `artwork-modal.tsx` (pavilion + works index) share the same behaviour —
   thumbnail strip, prev/next arrows, keyboard ← / →, and a `n / total` counter.
   The card shows an `Images` count badge when a piece has more than one photo.
+- **The zoom lens is desktop-only.** It is toggled by a `hidden md:inline-flex`
+  button and the magnifier itself carries `hidden md:block`, so phones never
+  show a lens. Keep both guards if you touch this.
+- **There is no "View in Room" mode.** The in-situ/room preview (and its
+  `in_situ_image_url` upload) was removed; the stage renders the gallery images
+  only. `in_situ_image_url` survives as a nullable column so old rows still load
+  — do not re-add a public room toggle without a fresh product decision.
 
 ## Site content CMS (editable public copy)
 
