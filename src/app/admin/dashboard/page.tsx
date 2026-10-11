@@ -15,7 +15,12 @@ export default async function DashboardPage() {
     // renders; middleware has already refreshed the cookie.
     const { data: ctx, error } = await createSupabaseContext({ auth: "user" });
     if (error || !ctx?.userClaims) redirect("/admin/login?next=/admin/dashboard");
-    return <DashboardClient email={ctx.userClaims.email ?? "curator@muhsingraphy.com"} />;
+    return (
+      <DashboardClient
+        email={ctx.userClaims.email ?? "curator@muhsingraphy.com"}
+        userMetadata={ctx.userClaims.userMetadata}
+      />
+    );
   }
 
   return <DashboardClient email="preview@muhsingraphy.com" />;

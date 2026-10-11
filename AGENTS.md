@@ -107,6 +107,14 @@ done
   panel in the editor for its words, speed, separator and a show/hide toggle
   (`visibility.ticker`). That toggle is intentionally excluded from the generic
   Section visibility panel so there is a single control for it.
+- **Curator account editing lives in the Account tab** of the dashboard
+  (`src/components/admin/account-panel.tsx` + `src/lib/account.ts`). Personal
+  info (full name, title, phone, bio) is stored in the auth user's
+  `user_metadata` and the password is changed with `supabase.auth.updateUser`.
+  Both use the browser client against the live session, so no service-role key
+  is involved; `userMetadata` is passed in from the server page for the header
+  display name. The panel degrades to the "not connected" notice when Supabase
+  is unconfigured.
 - **One-time setup**: if the `site_content` table is absent the public site uses
   defaults and the editor shows a setup notice instead of saving. Apply
   `supabase/site-content.sql` (idempotent) in the Supabase SQL Editor to enable
