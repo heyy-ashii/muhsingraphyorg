@@ -80,6 +80,14 @@ done
   enforcement boundary — see `supabase/schema.sql`.
 - **No admin link in the site header.** Access is only via the footer lock icon
   or `/admin/login` directly.
+- **The dashboard is a sidebar shell, not a tab strip.** `dashboard-client.tsx`
+  renders a left rail (`Overview · Artworks · Enquiries · Site Content ·
+  Account`) that collapses to a horizontal scroller on mobile; the active tab
+  owns the whole content column. Keep new panels inside that column and reuse
+  the shared `pill` / `STATUS_TONE` / `INQUIRY_TONE` helpers rather than
+  re-inventing status chips. Only one tab panel renders at a time — do not go
+  back to the old `tab === "x" ? … : <default>` shape that leaked one panel
+  under every other tab.
 - Design tokens are CSS variables in `src/app/globals.css`, surfaced to Tailwind
   in `tailwind.config.ts`. Use token classes (`text-ink`, `bg-canvas`,
   `border-line`, `text-gold`) rather than raw hex.

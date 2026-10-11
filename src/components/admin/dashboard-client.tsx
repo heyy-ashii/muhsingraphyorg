@@ -6,10 +6,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, Reorder, motion } from "framer-motion";
 import {
-  ArrowUpRight,
   Check,
+  ChevronRight,
+  CircleUser,
+  ExternalLink,
+  FileText,
   GripVertical,
   Images,
+  Inbox,
+  LayoutGrid,
   LoaderCircle,
   LogOut,
   Mail,
@@ -23,7 +28,6 @@ import type { Artwork, ArtworkInput, Inquiry, InquiryStatus } from "@/lib/types"
 import { ARTWORK_STATUSES, INQUIRY_STATUSES, galleryOf } from "@/lib/types";
 import type { ArtworkStatus } from "@/lib/types";
 import { cn, formatDate, pad } from "@/lib/utils";
-import { SITE } from "@/lib/site";
 import { BrandLockup } from "@/components/ui/brand-lockup";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
@@ -46,13 +50,30 @@ import { ContentEditor } from "./content-editor";
 import { AccountPanel } from "./account-panel";
 import { ArtworkFormDrawer } from "./artwork-form-drawer";
 
-type Tab = "artworks" | "inquiries" | "content" | "account";
+type Tab = "overview" | "artworks" | "inquiries" | "content" | "account";
+
+const NAV: { key: Tab; label: string; icon: typeof LayoutGrid }[] = [
+  { key: "overview", label: "Overview", icon: LayoutGrid },
+  { key: "artworks", label: "Artworks", icon: Images },
+  { key: "inquiries", label: "Enquiries", icon: Inbox },
+  { key: "content", label: "Site Content", icon: FileText },
+  { key: "account", label: "Account", icon: CircleUser },
+];
+
+const STATUS_TONE: Record<ArtworkStatus, string> = {
+  Available: "border-gold/45 bg-gold/10 text-gold-deep dark:text-gold",
+  "Private Collection": "border-line bg-canvas-2 text-muted",
+  Reserved: "border-sky-600/30 bg-sky-500/10 text-sky-700 dark:text-sky-400",
+};
 
 const INQUIRY_TONE: Record<InquiryStatus, string> = {
   New: "border-gold/50 bg-gold/10 text-gold-deep dark:text-gold",
   Responded: "border-emerald-600/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
   Archived: "border-line bg-canvas-2 text-muted",
 };
+
+/** Shared pill styles for status chips and controls. */
+const pill = "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium";
 
 export function DashboardClient({
   email,
@@ -64,7 +85,7 @@ export function DashboardClient({
   const router = useRouter();
   const configured = adminConfigured();
 
-  const [tab, setTab] = useState<Tab>("artworks");
+  const [tab, setTab] = useState<Tab>("overview");
   const [displayName, setDisplayName] = useState(() => displayNameOf(email, userMetadata));
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
@@ -118,6 +139,7 @@ export function DashboardClient({
     () => ({
       total: artworks.length,
       available: artworks.filter((a) => a.status === "Available").length,
+      featured: artworks.filter((a) => a.is_featured).length,
       newInquiries: inquiries.filter((i) => i.status === "New").length,
     }),
     [artworks, inquiries],
@@ -182,197 +204,220 @@ export function DashboardClient({
     }
   }
 
+  const openNew = () => {
+    setEditing(null);
+    setDrawerOpen(true);
+  };
+
+  const openEdit = (a: Artwork) => {
+    setEditing(a);
+    setDrawerOpen(true);
+  };
+
   return (
-    <div className="min-h-dvh bg-canvas-2/40">
-      {/* ── top bar ─────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 border-b border-line bg-canvas/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1500px] flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8">
-          <div className="flex items-center gap-6">
+    <div className="min-h-dvh bg-canvas-2/50">
+      <div className="mx-auto flex min-h-dvh w-full max-w-[1480px] flex-col lg:flex-row">
+        {/* ── sidebar ─────────────────────────────────────────── */}
+        <aside className="flex shrink-0 flex-col gap-6 border-line px-5 py-6 lg:w-[264px] lg:border-r lg:px-6 lg:py-8">
+          <Link href="/" className="inline-flex">
             <BrandLockup size="sm" />
-            <span className="hidden h-6 w-px bg-line sm:block" />
-            <span className="hidden font-mono text-[9px] uppercase tracking-[0.22em] text-muted sm:block">
-              Curator Dashboard
-            </span>
-          </div>
+          </Link>
 
-          <div className="flex items-center gap-2.5">
-            <Link
-              href="/"
-              className="hidden h-10 items-center gap-2 rounded-full border border-line px-4 font-mono text-[9px] uppercase tracking-[0.2em] text-muted transition-colors hover:border-gold/50 hover:text-gold sm:inline-flex"
-            >
-              View gallery
-              <ArrowUpRight size={12} />
-            </Link>
-            <span className="hidden max-w-[190px] truncate font-mono text-[9px] uppercase tracking-[0.16em] text-muted lg:block">
-              {displayName}
-            </span>
-            <button
-              type="button"
-              onClick={signOut}
-              className="inline-flex h-10 items-center gap-2 rounded-full border border-line px-4 font-mono text-[9px] uppercase tracking-[0.2em] text-ink transition-colors hover:border-gold/50 hover:text-gold"
-            >
-              <LogOut size={12} />
-              Sign out
-            </button>
-          </div>
-        </div>
-      </header>
+          <nav className="flex flex-row gap-1 overflow-x-auto lg:flex-col lg:overflow-visible">
+            {NAV.map(({ key, label, icon: Icon }) => {
+              const active = tab === key;
+              const count =
+                key === "artworks"
+                  ? artworks.length
+                  : key === "inquiries"
+                    ? inquiries.length
+                    : undefined;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setTab(key)}
+                  className={cn(
+                    "group inline-flex shrink-0 items-center gap-3 rounded-xl px-3.5 py-2.5 text-[13px] font-medium transition-colors duration-300 lg:w-full",
+                    active
+                      ? "bg-surface text-ink shadow-whisper"
+                      : "text-muted hover:bg-surface/60 hover:text-ink",
+                  )}
+                >
+                  <Icon
+                    size={16}
+                    className={cn(active ? "text-gold" : "text-muted group-hover:text-gold")}
+                  />
+                  <span className="whitespace-nowrap">{label}</span>
+                  {count !== undefined && count > 0 && (
+                    <span
+                      className={cn(
+                        "ml-auto hidden rounded-full px-2 py-0.5 text-[11px] font-medium lg:inline-block",
+                        active ? "bg-gold/15 text-gold-deep dark:text-gold" : "bg-canvas-2 text-muted",
+                      )}
+                    >
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
 
-      <main className="mx-auto max-w-[1500px] px-5 py-10 sm:px-8 sm:py-14">
-        {/* ── hero row ──────────────────────────────────────── */}
-        <div className="flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <p className="eyebrow">Atelier operations</p>
-            <h1 className="mt-3 font-display text-[clamp(2.2rem,4.4vw,3.4rem)] leading-none text-ink">
-              The Archive
-            </h1>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2.5">
-            <button
-              type="button"
-              onClick={() => void refresh()}
-              className="inline-flex h-11 items-center gap-2 rounded-full border border-line px-5 font-mono text-[9px] uppercase tracking-[0.2em] text-muted transition-colors hover:border-gold/50 hover:text-gold"
-            >
-              <RefreshCw size={12} className={cn(loading && "animate-spin")} />
-              Refresh
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setEditing(null);
-                setDrawerOpen(true);
-              }}
-              className="btn-ink h-11 rounded-full px-6 font-mono text-[9px] uppercase tracking-[0.22em]"
-            >
-              <Plus size={13} />
-              <span>Add New Artwork</span>
-            </button>
-          </div>
-        </div>
-
-        {/* ── stats ─────────────────────────────────────────── */}
-        <div className="mt-8 flex flex-wrap items-center gap-x-9 gap-y-3 border-y border-line py-4">
-          {[
-            ["Works", stats.total],
-            ["Available", stats.available],
-            ["New enquiries", stats.newInquiries],
-            ["Studio", SITE.studio.city],
-          ].map(([label, value]) => (
-            <div key={String(label)} className="flex items-baseline gap-2.5">
-              <span className="font-display text-[26px] leading-none text-ink">{value}</span>
-              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted">{label}</span>
+          <div className="mt-auto hidden border-t border-line pt-5 lg:block">
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold/15 font-display text-base text-gold-deep dark:text-gold">
+                {displayName.slice(0, 1).toUpperCase()}
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-[13px] font-medium text-ink">{displayName}</p>
+                <p className="truncate text-[11px] text-muted">{email}</p>
+              </div>
             </div>
-          ))}
-        </div>
+            <div className="mt-4 flex flex-col gap-1">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2.5 rounded-lg px-2 py-2 text-[12.5px] text-muted transition-colors hover:bg-surface/60 hover:text-ink"
+              >
+                <ExternalLink size={14} /> View gallery
+              </Link>
+              <button
+                type="button"
+                onClick={signOut}
+                className="inline-flex items-center gap-2.5 rounded-lg px-2 py-2 text-left text-[12.5px] text-muted transition-colors hover:bg-surface/60 hover:text-red-500"
+              >
+                <LogOut size={14} /> Sign out
+              </button>
+            </div>
+          </div>
+        </aside>
 
-        {/* ── tabs ──────────────────────────────────────────── */}
-        <div className="mt-10 flex flex-wrap items-center gap-1 border-b border-line">
-          {(
-            [
-              ["artworks", `Artworks (${artworks.length})`],
-              ["inquiries", `Enquiries (${inquiries.length})`],
-              ["content", "Site Content"],
-              ["account", "Account"],
-            ] as const
-          ).map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => setTab(key)}
-              className={cn(
-                "relative px-5 py-3.5 font-mono text-[10px] uppercase tracking-[0.2em] transition-colors duration-400",
-                tab === key ? "text-ink" : "text-muted hover:text-ink",
-              )}
-            >
-              {label}
-              {tab === key && (
-                <motion.span
-                  layoutId="admin-tab"
-                  className="absolute inset-x-0 -bottom-px h-px bg-gold"
-                  transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                />
-              )}
-            </button>
-          ))}
-        </div>
-
-        <AnimatePresence>
-          {savedFlash && (
-            <motion.p
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="mt-6 inline-flex items-center gap-2 border border-gold/40 bg-gold/10 px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.18em] text-gold-deep dark:text-gold"
-            >
-              <Check size={12} /> Archive updated
-            </motion.p>
-          )}
-        </AnimatePresence>
-
-        {error && (
-          <div className="mt-6 border border-red-500/30 bg-red-500/5 px-5 py-4">
-            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-red-600 dark:text-red-400">
-              {error}
-            </p>
-            {!configured && (
-              <p className="mt-2 text-[12.5px] leading-relaxed text-muted">
-                Add the keys to <code className="font-mono text-[11px]">.env.local</code>, then run{" "}
-                <code className="font-mono text-[11px]">supabase/schema.sql</code> in your project.
+        {/* ── content ─────────────────────────────────────────── */}
+        <div className="min-w-0 flex-1 px-5 py-7 sm:px-8 sm:py-10">
+          <header className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 className="font-display text-[clamp(1.9rem,3.2vw,2.6rem)] leading-none text-ink">
+                {NAV.find((n) => n.key === tab)?.label}
+              </h1>
+              <p className="mt-2 text-[13px] text-muted">
+                {tab === "overview" && "Your atelier at a glance."}
+                {tab === "artworks" && "Add, sequence and curate the works in the gallery."}
+                {tab === "inquiries" && "Commission requests from collectors."}
+                {tab === "content" && "Edit the copy and imagery shown on the public site."}
+                {tab === "account" && "Your curator profile and password."}
               </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => void refresh()}
+                aria-label="Refresh"
+                title="Refresh"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-gold/50 hover:text-gold"
+              >
+                <RefreshCw size={15} className={cn(loading && "animate-spin")} />
+              </button>
+              <button
+                type="button"
+                onClick={signOut}
+                aria-label="Sign out"
+                title="Sign out"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-red-500/50 hover:text-red-500 lg:hidden"
+              >
+                <LogOut size={15} />
+              </button>
+              {tab === "artworks" && (
+                <button
+                  type="button"
+                  onClick={openNew}
+                  className="btn-ink h-10 rounded-full px-5 text-[12px] font-medium"
+                >
+                  <Plus size={14} />
+                  <span>Add artwork</span>
+                </button>
+              )}
+            </div>
+          </header>
+
+          <AnimatePresence>
+            {savedFlash && (
+              <motion.p
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="mt-6 inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-4 py-2 text-[12px] text-gold-deep dark:text-gold"
+              >
+                <Check size={13} /> Saved
+              </motion.p>
+            )}
+          </AnimatePresence>
+
+          {error && (
+            <div className="mt-6 rounded-xl border border-red-500/30 bg-red-500/5 px-5 py-4">
+              <p className="text-[13px] text-red-600 dark:text-red-400">{error}</p>
+              {!configured && (
+                <p className="mt-1.5 text-[12.5px] leading-relaxed text-muted">
+                  Add the keys to <code className="font-mono text-[11px]">.env.local</code>, then run{" "}
+                  <code className="font-mono text-[11px]">supabase/schema.sql</code> in your project.
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="mt-7">
+            {loading ? (
+              <div className="flex min-h-[320px] items-center justify-center">
+                <LoaderCircle size={22} className="animate-spin text-gold" />
+              </div>
+            ) : tab === "overview" ? (
+              <OverviewPanel
+                artworks={artworks}
+                inquiries={inquiries}
+                stats={stats}
+                onAdd={openNew}
+                onEdit={openEdit}
+                onGoTo={setTab}
+              />
+            ) : tab === "artworks" ? (
+              <ArtworksPanel
+                artworks={artworks}
+                onReorder={persistOrder}
+                onEdit={openEdit}
+                onDelete={handleDelete}
+                onSetStatus={setStatus}
+                onToggleFeatured={toggleFeatured}
+                onAdd={openNew}
+              />
+            ) : tab === "inquiries" ? (
+              <InquiriesPanel
+                inquiries={inquiries}
+                onStatus={async (id, status) => {
+                  setInquiries((prev) => prev.map((i) => (i.id === id ? { ...i, status } : i)));
+                  try {
+                    await setInquiryStatus(id, status);
+                  } catch {
+                    void refresh();
+                  }
+                }}
+                onDelete={async (id) => {
+                  if (!window.confirm("Delete this enquiry permanently?")) return;
+                  setInquiries((prev) => prev.filter((i) => i.id !== id));
+                  try {
+                    await deleteInquiry(id);
+                  } catch {
+                    void refresh();
+                  }
+                }}
+              />
+            ) : tab === "content" ? (
+              <ContentEditor initial={content} tableMissing={contentMissing} />
+            ) : (
+              <AccountPanel email={email} onProfileSaved={(name) => name && setDisplayName(name)} />
             )}
           </div>
-        )}
-
-        {loading ? (
-          <div className="flex min-h-[320px] items-center justify-center">
-            <LoaderCircle size={22} className="animate-spin text-gold" />
-          </div>
-        ) : tab === "artworks" ? (
-          <ArtworksPanel
-            artworks={artworks}
-            onReorder={persistOrder}
-            onEdit={(a) => {
-              setEditing(a);
-              setDrawerOpen(true);
-            }}
-            onDelete={handleDelete}
-            onSetStatus={setStatus}
-            onToggleFeatured={toggleFeatured}
-          />
-        ) : tab === "inquiries" ? (
-          <InquiriesPanel
-            inquiries={inquiries}
-            onStatus={async (id, status) => {
-              setInquiries((prev) => prev.map((i) => (i.id === id ? { ...i, status } : i)));
-              try {
-                await setInquiryStatus(id, status);
-              } catch {
-                void refresh();
-              }
-            }}
-            onDelete={async (id) => {
-              if (!window.confirm("Delete this enquiry permanently?")) return;
-              setInquiries((prev) => prev.filter((i) => i.id !== id));
-              try {
-                await deleteInquiry(id);
-              } catch {
-                void refresh();
-              }
-            }}
-          />
-        ) : null}
-
-        {tab === "content" && (
-          <div className="mt-8">
-            <ContentEditor initial={content} tableMissing={contentMissing} />
-          </div>
-        )}
-
-        {tab === "account" && (
-          <AccountPanel email={email} onProfileSaved={(name) => name && setDisplayName(name)} />
-        )}
-      </main>
+        </div>
+      </div>
 
       <ArtworkFormDrawer
         open={drawerOpen}
@@ -381,6 +426,150 @@ export function DashboardClient({
         onClose={() => setDrawerOpen(false)}
         onSubmit={handleSubmit}
       />
+    </div>
+  );
+}
+
+/* ── overview ─────────────────────────────────────────────── */
+
+function OverviewPanel({
+  artworks,
+  inquiries,
+  stats,
+  onAdd,
+  onEdit,
+  onGoTo,
+}: {
+  artworks: Artwork[];
+  inquiries: Inquiry[];
+  stats: { total: number; available: number; featured: number; newInquiries: number };
+  onAdd: () => void;
+  onEdit: (a: Artwork) => void;
+  onGoTo: (tab: Tab) => void;
+}) {
+  const cards: { label: string; value: string | number; hint: string; tab?: Tab }[] = [
+    { label: "Works in archive", value: stats.total, hint: "Total pieces", tab: "artworks" },
+    { label: "Available", value: stats.available, hint: "Open to acquisition" },
+    { label: "Featured", value: stats.featured, hint: "In hero & pavilion" },
+    {
+      label: "New enquiries",
+      value: stats.newInquiries,
+      hint: "Awaiting reply",
+      tab: "inquiries",
+    },
+  ];
+
+  const recentWorks = [...artworks].sort((a, b) => a.display_order - b.display_order).slice(0, 4);
+  const recentInquiries = inquiries.slice(0, 3);
+
+  return (
+    <div className="space-y-8">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {cards.map((c) => (
+          <button
+            key={c.label}
+            type="button"
+            onClick={() => c.tab && onGoTo(c.tab)}
+            disabled={!c.tab}
+            className={cn(
+              "rounded-2xl border border-line bg-surface p-5 text-left transition-colors",
+              c.tab && "hover:border-gold/40",
+            )}
+          >
+            <p className="font-display text-[38px] leading-none text-ink">{c.value}</p>
+            <p className="mt-3 text-[13px] font-medium text-ink">{c.label}</p>
+            <p className="mt-0.5 text-[11.5px] text-muted">{c.hint}</p>
+          </button>
+        ))}
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr]">
+        <section className="rounded-2xl border border-line bg-surface">
+          <div className="flex items-center justify-between gap-4 border-b border-line px-5 py-4">
+            <h2 className="text-[13.5px] font-semibold text-ink">Recent works</h2>
+            <button
+              type="button"
+              onClick={() => onGoTo("artworks")}
+              className="inline-flex items-center gap-1 text-[12px] text-muted transition-colors hover:text-gold"
+            >
+              View all <ChevronRight size={13} />
+            </button>
+          </div>
+          {recentWorks.length ? (
+            <ul className="divide-y divide-line">
+              {recentWorks.map((a) => (
+                <li key={a.id}>
+                  <button
+                    type="button"
+                    onClick={() => onEdit(a)}
+                    className="flex w-full items-center gap-4 px-5 py-3.5 text-left transition-colors hover:bg-canvas-2/50"
+                  >
+                    <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-canvas-2">
+                      <Image src={a.image_url} alt="" fill sizes="48px" className="object-cover" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[13.5px] font-medium text-ink">
+                        {a.title}
+                      </span>
+                      <span className="mt-0.5 block truncate text-[11.5px] text-muted">
+                        {a.script_style} · {a.year}
+                      </span>
+                    </span>
+                    <span className={cn(pill, "shrink-0", STATUS_TONE[a.status])}>{a.status}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="px-5 py-10 text-center">
+              <p className="text-[13px] text-muted">No works yet.</p>
+              <button
+                type="button"
+                onClick={onAdd}
+                className="mt-4 inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-[12px] text-ink transition-colors hover:border-gold/50 hover:text-gold"
+              >
+                <Plus size={13} /> Add the first artwork
+              </button>
+            </div>
+          )}
+        </section>
+
+        <section className="rounded-2xl border border-line bg-surface">
+          <div className="flex items-center justify-between gap-4 border-b border-line px-5 py-4">
+            <h2 className="text-[13.5px] font-semibold text-ink">Latest enquiries</h2>
+            <button
+              type="button"
+              onClick={() => onGoTo("inquiries")}
+              className="inline-flex items-center gap-1 text-[12px] text-muted transition-colors hover:text-gold"
+            >
+              View all <ChevronRight size={13} />
+            </button>
+          </div>
+          {recentInquiries.length ? (
+            <ul className="divide-y divide-line">
+              {recentInquiries.map((inq) => (
+                <li key={inq.id} className="px-5 py-3.5">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="truncate text-[13.5px] font-medium text-ink">
+                      {inq.client_name}
+                    </span>
+                    <span className={cn(pill, "shrink-0", INQUIRY_TONE[inq.status])}>
+                      {inq.status}
+                    </span>
+                  </div>
+                  <p className="mt-1 truncate text-[11.5px] text-muted">
+                    {inq.commission_type} · {formatDate(inq.created_at)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="px-5 py-10 text-center text-[13px] text-muted">
+              No enquiries recorded yet.
+            </p>
+          )}
+        </section>
+      </div>
     </div>
   );
 }
@@ -394,6 +583,7 @@ function ArtworksPanel({
   onDelete,
   onSetStatus,
   onToggleFeatured,
+  onAdd,
 }: {
   artworks: Artwork[];
   onReorder: (next: Artwork[]) => void;
@@ -401,73 +591,75 @@ function ArtworksPanel({
   onDelete: (a: Artwork) => void;
   onSetStatus: (a: Artwork, status: ArtworkStatus) => void;
   onToggleFeatured: (a: Artwork) => void;
+  onAdd: () => void;
 }) {
   if (!artworks.length) {
     return (
-      <p className="mt-16 text-center font-display text-2xl text-muted">
-        No works yet. Add the first piece to the archive.
-      </p>
+      <div className="rounded-2xl border border-dashed border-line px-6 py-20 text-center">
+        <p className="font-display text-2xl text-ink">The archive is empty</p>
+        <p className="mx-auto mt-2 max-w-sm text-[13px] text-muted">
+          Add the first piece to begin the collection.
+        </p>
+        <button
+          type="button"
+          onClick={onAdd}
+          className="btn-ink mt-6 h-10 rounded-full px-5 text-[12px] font-medium"
+        >
+          <Plus size={14} /> Add artwork
+        </button>
+      </div>
     );
   }
 
   return (
-    <div className="mt-8">
-      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
-        Drag the handles to re-sequence the pavilion
-      </p>
+    <div>
+      <p className="mb-4 text-[12px] text-muted">Drag the handles to re-sequence the pavilion.</p>
 
-      <Reorder.Group
-        axis="y"
-        values={artworks}
-        onReorder={onReorder}
-        className="mt-5 space-y-2"
-      >
+      <Reorder.Group axis="y" values={artworks} onReorder={onReorder} className="space-y-3">
         {artworks.map((artwork, i) => (
           <Reorder.Item
             key={artwork.id}
             value={artwork}
-            className="group grid grid-cols-[auto_56px_1fr_auto] items-center gap-4 border border-line bg-surface px-4 py-3.5 sm:grid-cols-[auto_64px_1.6fr_1fr_auto] sm:gap-6"
+            className="group flex items-center gap-4 rounded-2xl border border-line bg-surface p-3.5 transition-colors hover:border-gold/35 sm:gap-5 sm:p-4"
           >
             <button
               type="button"
               aria-label="Drag to reorder"
-              className="cursor-grab touch-none text-muted transition-colors hover:text-gold active:cursor-grabbing"
+              className="hidden cursor-grab touch-none text-muted/60 transition-colors hover:text-gold active:cursor-grabbing sm:block"
             >
               <GripVertical size={16} />
             </button>
 
-            <div className="relative h-16 w-16 overflow-hidden bg-canvas-2 sm:h-[72px] sm:w-[72px]">
+            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-canvas-2 sm:h-[68px] sm:w-[68px]">
               <Image src={artwork.image_url} alt="" fill sizes="80px" className="object-cover" />
             </div>
 
-            <div className="min-w-0">
-              <div className="flex items-center gap-2.5">
-                <span className="font-mono text-[9px] tracking-[0.2em] text-gold">{pad(i + 1, 3)}</span>
-                <h3 className="truncate font-display text-xl text-ink">{artwork.title}</h3>
-                {artwork.is_featured && <Sparkles size={12} className="shrink-0 text-gold" />}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] text-gold">{pad(i + 1, 3)}</span>
+                <h3 className="truncate text-[15px] font-medium text-ink">{artwork.title}</h3>
+                {artwork.is_featured && <Sparkles size={13} className="shrink-0 text-gold" />}
               </div>
-              <div className="mt-1 flex items-center gap-3">
-                <p className="truncate font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11.5px] text-muted">
+                <span className="truncate">
                   {artwork.script_style} · {artwork.dimensions} · {artwork.year}
-                </p>
+                </span>
                 {galleryOf(artwork).length > 1 && (
-                  <span className="inline-flex shrink-0 items-center gap-1 font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
-                    <Images size={11} /> {galleryOf(artwork).length}
+                  <span className="inline-flex shrink-0 items-center gap-1">
+                    <Images size={11} /> {galleryOf(artwork).length} images
                   </span>
                 )}
               </div>
             </div>
 
-            <label className="hidden sm:block">
+            <label className="hidden md:block">
               <span className="sr-only">Status for {artwork.title}</span>
               <select
                 value={artwork.status}
                 onChange={(e) => onSetStatus(artwork, e.target.value as ArtworkStatus)}
                 className={cn(
-                  "h-9 rounded-full border bg-transparent px-3 font-mono text-[9px] uppercase tracking-[0.16em] outline-none transition-colors duration-400",
-                  artwork.status === "Available"
-                    ? "border-gold/50 text-gold-deep dark:text-gold"
-                    : "border-line text-muted hover:border-gold/35 hover:text-ink",
+                  "h-8 cursor-pointer rounded-full border bg-transparent px-3 text-[11.5px] font-medium outline-none transition-colors",
+                  STATUS_TONE[artwork.status],
                 )}
               >
                 {ARTWORK_STATUSES.map((s) => (
@@ -478,36 +670,38 @@ function ArtworksPanel({
               </select>
             </label>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => onToggleFeatured(artwork)}
                 aria-label="Toggle featured"
-                title="Toggle featured"
+                title="Feature in hero & pavilion"
                 className={cn(
-                  "inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors",
+                  "inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors",
                   artwork.is_featured
-                    ? "border-gold/50 text-gold"
-                    : "border-line text-muted hover:border-gold/40 hover:text-gold",
+                    ? "text-gold hover:bg-gold/10"
+                    : "text-muted/70 hover:bg-canvas-2 hover:text-gold",
                 )}
               >
-                <Sparkles size={13} />
+                <Sparkles size={15} />
               </button>
               <button
                 type="button"
                 onClick={() => onEdit(artwork)}
                 aria-label="Edit artwork"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-gold/40 hover:text-gold"
+                title="Edit"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-canvas-2 hover:text-ink"
               >
-                <Pencil size={13} />
+                <Pencil size={15} />
               </button>
               <button
                 type="button"
                 onClick={() => onDelete(artwork)}
                 aria-label="Delete artwork"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-red-500/50 hover:text-red-500"
+                title="Delete"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted/70 transition-colors hover:bg-red-500/10 hover:text-red-500"
               >
-                <Trash size={13} />
+                <Trash size={15} />
               </button>
             </div>
           </Reorder.Item>
@@ -530,32 +724,31 @@ function InquiriesPanel({
 }) {
   if (!inquiries.length) {
     return (
-      <p className="mt-16 text-center font-display text-2xl text-muted">
-        No commission enquiries recorded yet.
-      </p>
+      <div className="rounded-2xl border border-dashed border-line px-6 py-20 text-center">
+        <p className="font-display text-2xl text-ink">No enquiries yet</p>
+        <p className="mx-auto mt-2 max-w-sm text-[13px] text-muted">
+          Commission requests submitted through the site will appear here.
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className="mt-8 space-y-3">
+    <div className="space-y-3">
       {inquiries.map((inq) => (
-        <article key={inq.id} className="border border-line bg-surface p-6 sm:p-7">
-          <div className="flex flex-wrap items-start justify-between gap-5">
+        <article key={inq.id} className="rounded-2xl border border-line bg-surface p-5 sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-3">
-                <h3 className="font-display text-2xl text-ink">{inq.client_name}</h3>
-                <span
-                  className={cn(
-                    "rounded-full border px-3 py-1 font-mono text-[9px] uppercase tracking-[0.16em]",
-                    INQUIRY_TONE[inq.status],
-                  )}
-                >
-                  {inq.status}
-                </span>
+                <h3 className="text-[15px] font-medium text-ink">{inq.client_name}</h3>
+                <span className={cn(pill, INQUIRY_TONE[inq.status])}>{inq.status}</span>
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
-                <a href={`mailto:${inq.client_email}`} className="link-underline inline-flex items-center gap-1.5 hover:text-gold">
-                  <Mail size={10} /> {inq.client_email}
+              <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11.5px] text-muted">
+                <a
+                  href={`mailto:${inq.client_email}`}
+                  className="inline-flex items-center gap-1.5 transition-colors hover:text-gold"
+                >
+                  <Mail size={12} /> {inq.client_email}
                 </a>
                 <span>{inq.commission_type}</span>
                 <span>{formatDate(inq.created_at)}</span>
@@ -569,7 +762,7 @@ function InquiriesPanel({
                   type="button"
                   onClick={() => onStatus(inq.id, s)}
                   className={cn(
-                    "rounded-full border px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.14em] transition-colors duration-400",
+                    "rounded-full border px-3 py-1 text-[11.5px] font-medium transition-colors",
                     inq.status === s
                       ? "border-gold/50 bg-gold/10 text-gold-deep dark:text-gold"
                       : "border-line text-muted hover:border-gold/35 hover:text-ink",
@@ -582,14 +775,14 @@ function InquiriesPanel({
                 type="button"
                 onClick={() => onDelete(inq.id)}
                 aria-label="Delete enquiry"
-                className="ml-1 inline-flex h-9 w-9 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-red-500/50 hover:text-red-500"
+                className="ml-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted/70 transition-colors hover:bg-red-500/10 hover:text-red-500"
               >
-                <Trash size={13} />
+                <Trash size={14} />
               </button>
             </div>
           </div>
 
-          <p className="mt-5 max-w-[86ch] border-t border-line pt-5 text-pretty text-[14.5px] leading-relaxed text-ink-soft">
+          <p className="mt-4 max-w-[86ch] border-t border-line pt-4 text-[13.5px] leading-relaxed text-ink-soft">
             {inq.message}
           </p>
         </article>
