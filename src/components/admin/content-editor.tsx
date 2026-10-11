@@ -29,10 +29,12 @@ function TickerPreview({
   words,
   speed,
   separator,
+  visible = true,
 }: {
   words: string[];
   speed: "slow" | "medium" | "fast";
   separator: "diamond" | "dot" | "bar" | "none";
+  visible?: boolean;
 }) {
   const SPEED: Record<string, string> = {
     slow: "animate-marquee-slow",
@@ -58,7 +60,7 @@ function TickerPreview({
   return (
     <div>
       <Label>Preview</Label>
-      <div className="mt-2 overflow-hidden border border-line bg-canvas-2/40 py-5">
+      <div className="relative mt-2 overflow-hidden border border-line bg-canvas-2/40 py-5">
         {loop.length ? (
           <div className={cn("flex w-max items-center", SPEED[speed])}>
             {loop.map((w, i) => (
@@ -75,13 +77,20 @@ function TickerPreview({
             No words — add some above.
           </p>
         )}
+        {!visible && (
+          <span className="absolute inset-0 flex items-center justify-center bg-canvas/70 backdrop-blur-[2px]">
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
+              Hidden from the home page
+            </span>
+          </span>
+        )}
       </div>
     </div>
   );
 }
 
 const SECTION_META: { key: SectionKey; title: string; index: string; hint: string }[] = [
-  { key: "ticker", title: "Calligraphic ticker", index: "—", hint: "Marquee words, speed and separator." },
+  { key: "ticker", title: "Moving banner", index: "—", hint: "Marquee words, speed, separator and visibility." },
   { key: "works", title: "Selected Works pavilion", index: "001", hint: "Heading, description and filter chips." },
   { key: "atelier", title: "About the artist", index: "002", hint: "Portrait, philosophy, quote and metrics." },
   { key: "craft", title: "Sacred Craft & Materials", index: "003", hint: "The four instruments." },
@@ -191,7 +200,7 @@ export function ContentEditor({
         {/* ── Section visibility ───────────────────────────── */}
         <Panel title="Section visibility" description="Hide any section from the public site. The navbar and footer stay.">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {SECTION_META.map(({ key, title }) => (
+            {SECTION_META.filter((s) => s.key !== "ticker").map(({ key, title }) => (
               <Toggle
                 key={key}
                 label={title}
@@ -200,6 +209,9 @@ export function ContentEditor({
               />
             ))}
           </div>
+          <p className="text-[12.5px] leading-relaxed text-muted">
+            The moving banner has its own show/hide control in the “Moving banner” panel below.
+          </p>
         </Panel>
 
         {/* ── Hero ─────────────────────────────────────────── */}
@@ -234,8 +246,18 @@ export function ContentEditor({
           </Panel>
         ))}
 
-        {/* ── Ticker ───────────────────────────────────────── */}
-        <Panel title="Calligraphic ticker" index="—" description="The moving bar on the home page: its words, speed and separator.">
+        {/* ── Moving banner (ticker) ───────────────────────── */}
+        <Panel
+          title="Moving banner"
+          index="—"
+          description="The scrolling bar under the hero. Edit its words, speed and separator, or hide it from the home page."
+        >
+          <Toggle
+            label="Show the moving banner"
+            hint="Turn off to remove the banner from the home page. Your words and styling are kept."
+            checked={draft.visibility.ticker ?? true}
+            onChange={(v) => apply(edit(draft, (d) => void (d.visibility.ticker = v)))}
+          />
           <StringList label="Words" items={draft.ticker} onChange={(v) => apply(edit(draft, (d) => void (d.ticker = v)))} placeholder="e.g. THULUTH" />
           <Grid>
             <Segmented
@@ -262,7 +284,12 @@ export function ContentEditor({
               onChange={(v) => apply(edit(draft, (d) => void (d.tickerStyle.separator = v)))}
             />
           </Grid>
-          <TickerPreview words={draft.ticker} speed={draft.tickerStyle.speed} separator={draft.tickerStyle.separator} />
+          <TickerPreview
+            words={draft.ticker}
+            speed={draft.tickerStyle.speed}
+            separator={draft.tickerStyle.separator}
+            visible={draft.visibility.ticker ?? true}
+          />
         </Panel>
       </div>
 

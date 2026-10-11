@@ -103,6 +103,10 @@ done
 - Admin editing lives in the **Site Content** tab of the dashboard
   (`src/components/admin/content-editor.tsx` + `fields.tsx`), saving through
   `saveSiteContent()` in `src/lib/admin.ts` (browser client, so RLS applies).
+- The **Moving banner** (the marquee `<Ticker>` under the hero) has a dedicated
+  panel in the editor for its words, speed, separator and a show/hide toggle
+  (`visibility.ticker`). That toggle is intentionally excluded from the generic
+  Section visibility panel so there is a single control for it.
 - **Curator account editing lives in the Account tab** of the dashboard
   (`src/components/admin/account-panel.tsx` + `src/lib/account.ts`). Personal
   info (full name, title, phone, bio) is stored in the auth user's
