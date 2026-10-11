@@ -11,9 +11,9 @@ export const SITE = {
   whatsappDisplay: "+91 98471 39131",
   email: "hello@muhsingraphy.com",
   studio: {
-    city: "Kochi, Kerala",
+    city: "Kannur, Kerala",
     country: "India",
-    line1: "The Atelier — Fort Kochi",
+    line1: "The Atelier — Kannur",
     line2: "By appointment only",
   },
   nav: [

@@ -69,9 +69,9 @@ export const DEFAULT_CONTENT: SiteContent = {
     eyebrow: "Atelier Muhsin",
     lines: ["A practice in line,", "space and texture."],
     description:
-      "Muhsin works from a private studio in Fort Kochi, writing in the classical disciplines while pushing them into contemporary scale. Each canvas passes through his hands alone — composition, inking, gilding and finishing.",
+      "Muhsin works from a private studio in Kannur, writing in the classical disciplines while pushing them into contemporary scale. Each canvas passes through his hands alone — composition, inking, gilding and finishing.",
     imageUrl: "/assets/artwork-01.jpg",
-    imageCaption: "Master calligrapher · Fort Kochi, India",
+    imageCaption: "Master calligrapher · Kannur, India",
     quote: "A letter is not finished when it is beautiful. It is finished when it is inevitable.",
     quoteAttribution: "Muhsin — studio note, MMXXIV",
     intro:
