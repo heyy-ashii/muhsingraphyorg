@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowUp, Lock } from "lucide-react";
 import { useSiteContent } from "@/lib/content/context";
+import { whatsappPhoneLink } from "@/lib/whatsapp";
 import { BrandLockup } from "@/components/ui/brand-lockup";
 import { BrandMark } from "@/components/ui/brand-mark";
 
@@ -112,7 +113,9 @@ export function Footer() {
             </a>
             <span className="px-1.5 text-muted/50">·</span>
             <a
-              href={`tel:${credit.phone}`}
+              href={whatsappPhoneLink(credit.phone)}
+              target="_blank"
+              rel="noopener noreferrer"
               className="link-underline text-ink/70 transition-colors duration-500 hover:text-gold"
             >
               {credit.phoneDisplay}

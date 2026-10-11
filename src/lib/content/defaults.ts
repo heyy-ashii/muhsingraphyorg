@@ -35,8 +35,8 @@ export const DEFAULT_CONTENT: SiteContent = {
   nav: SITE.nav.map((n) => ({ label: n.label, href: n.href })),
   credit: {
     label: "Site by",
-    name: "ashique.pilssery",
-    instagram: "https://www.instagram.com/ashique.pilssery",
+    name: "ashique.pilassery",
+    instagram: "https://www.instagram.com/ashique.pilassery",
     phone: "919745209528",
     phoneDisplay: "+91 97452 09528",
   },
