@@ -11,6 +11,7 @@ import {
   ImageField,
   Label,
   Panel,
+  Segmented,
   StringList,
   Text,
   Toggle,
@@ -23,8 +24,64 @@ function edit<T>(obj: T, fn: (draft: T) => void): T {
   return copy;
 }
 
+/** Live, non-interactive preview of the ticker bar shown in the home page. */
+function TickerPreview({
+  words,
+  speed,
+  separator,
+}: {
+  words: string[];
+  speed: "slow" | "medium" | "fast";
+  separator: "diamond" | "dot" | "bar" | "none";
+}) {
+  const SPEED: Record<string, string> = {
+    slow: "animate-marquee-slow",
+    medium: "animate-marquee",
+    fast: "animate-marquee-fast",
+  };
+  const items = words?.length ? words : [];
+  const loop = [...items, ...items, ...items];
+
+  const Mark = () => {
+    if (separator === "none") return <span className="mx-6 inline-block" />;
+    if (separator === "dot") return <span className="mx-8 inline-block h-1.5 w-1.5 rounded-full bg-gold" />;
+    if (separator === "bar") return <span className="mx-8 inline-block h-4 w-px bg-gold/70" />;
+    return (
+      <span className="mx-8 inline-block">
+        <svg width="9" height="9" viewBox="0 0 10 10" className="text-gold">
+          <path d="M5 0l5 5-5 5-5-5z" fill="currentColor" />
+        </svg>
+      </span>
+    );
+  };
+
+  return (
+    <div>
+      <Label>Preview</Label>
+      <div className="mt-2 overflow-hidden border border-line bg-canvas-2/40 py-5">
+        {loop.length ? (
+          <div className={cn("flex w-max items-center", SPEED[speed])}>
+            {loop.map((w, i) => (
+              <span key={`${w}-${i}`} className="flex shrink-0 items-center">
+                <span className="whitespace-nowrap font-display text-[clamp(1rem,2.2vw,1.6rem)] uppercase tracking-[0.18em] text-ink-soft">
+                  {w}
+                </span>
+                <Mark />
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p className="px-4 font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+            No words — add some above.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const SECTION_META: { key: SectionKey; title: string; index: string; hint: string }[] = [
-  { key: "ticker", title: "Calligraphic ticker", index: "—", hint: "Marquee words separated by gold diamonds." },
+  { key: "ticker", title: "Calligraphic ticker", index: "—", hint: "Marquee words, speed and separator." },
   { key: "works", title: "Selected Works pavilion", index: "001", hint: "Heading, description and filter chips." },
   { key: "atelier", title: "About the artist", index: "002", hint: "Portrait, philosophy, quote and metrics." },
   { key: "craft", title: "Sacred Craft & Materials", index: "003", hint: "The four instruments." },
@@ -178,8 +235,34 @@ export function ContentEditor({
         ))}
 
         {/* ── Ticker ───────────────────────────────────────── */}
-        <Panel title="Calligraphic ticker" index="—" description="Marquee words separated by gold diamonds.">
+        <Panel title="Calligraphic ticker" index="—" description="The moving bar on the home page: its words, speed and separator.">
           <StringList label="Words" items={draft.ticker} onChange={(v) => apply(edit(draft, (d) => void (d.ticker = v)))} placeholder="e.g. THULUTH" />
+          <Grid>
+            <Segmented
+              label="Speed"
+              hint="How fast the words travel."
+              value={draft.tickerStyle.speed}
+              options={[
+                { value: "slow", label: "Slow" },
+                { value: "medium", label: "Medium" },
+                { value: "fast", label: "Fast" },
+              ]}
+              onChange={(v) => apply(edit(draft, (d) => void (d.tickerStyle.speed = v)))}
+            />
+            <Segmented
+              label="Separator"
+              hint="Mark placed between each word."
+              value={draft.tickerStyle.separator}
+              options={[
+                { value: "diamond", label: "Diamond" },
+                { value: "dot", label: "Dot" },
+                { value: "bar", label: "Bar" },
+                { value: "none", label: "None" },
+              ]}
+              onChange={(v) => apply(edit(draft, (d) => void (d.tickerStyle.separator = v)))}
+            />
+          </Grid>
+          <TickerPreview words={draft.ticker} speed={draft.tickerStyle.speed} separator={draft.tickerStyle.separator} />
         </Panel>
       </div>
 

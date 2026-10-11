@@ -120,6 +120,18 @@ export interface CreditCopy {
   phoneDisplay: string;
 }
 
+export const TICKER_SPEEDS = ["slow", "medium", "fast"] as const;
+export type TickerSpeed = (typeof TICKER_SPEEDS)[number];
+
+export const TICKER_SEPARATORS = ["diamond", "dot", "bar", "none"] as const;
+export type TickerSeparator = (typeof TICKER_SEPARATORS)[number];
+
+/** Presentation of the moving calligraphic bar. */
+export interface TickerStyle {
+  speed: TickerSpeed;
+  separator: TickerSeparator;
+}
+
 export interface SiteContent {
   brand: BrandCopy;
   contact: ContactCopy;
@@ -128,6 +140,7 @@ export interface SiteContent {
   visibility: Record<SectionKey, boolean>;
   hero: HeroCopy;
   ticker: string[];
+  tickerStyle: TickerStyle;
   works: WorksSection;
   atelier: AtelierSection;
   craft: CraftSection;

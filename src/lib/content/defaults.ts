@@ -50,7 +50,7 @@ export const DEFAULT_CONTENT: SiteContent = {
     commissions: true,
   },
   hero: {
-    eyebrow: "Portfolio · MMXXVI",
+    eyebrow: "",
     headline: ["The quiet", "power of a", "single stroke."],
     body: "Expressive calligraphy. Rich surfaces. A conversation between the mark and the space it leaves behind — hand-inked and gilded at the atelier of Muhsin.",
     ctaLabel: "View Selected Works",
@@ -65,6 +65,7 @@ export const DEFAULT_CONTENT: SiteContent = {
     ],
   },
   ticker: [...SITE.ticker],
+  tickerStyle: { speed: "slow", separator: "diamond" },
   works: {
     eyebrow: "Selected Works",
     lines: ["The pavilion.", "Original canvases."],

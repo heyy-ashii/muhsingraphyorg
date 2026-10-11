@@ -65,8 +65,12 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
             transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-wrap items-center gap-3"
           >
-            <span className="eyebrow">{hero.eyebrow}</span>
-            <span className="h-px w-8 bg-gold/50" />
+            {hero.eyebrow ? (
+              <>
+                <span className="eyebrow">{hero.eyebrow}</span>
+                <span className="h-px w-8 bg-gold/50" />
+              </>
+            ) : null}
             <StatusBadge status="Available" size="sm" />
           </motion.div>
 

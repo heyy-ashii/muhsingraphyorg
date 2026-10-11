@@ -76,6 +76,7 @@ const config: Config = {
       animation: {
         marquee: "marquee 46s linear infinite",
         "marquee-slow": "marquee 72s linear infinite",
+        "marquee-fast": "marquee 28s linear infinite",
         shimmer: "shimmer 3.4s ease-in-out infinite",
         drift: "drift 22s ease-in-out infinite",
         "pulse-ring": "pulse-ring 2.6s cubic-bezier(0.22,1,0.36,1) infinite",

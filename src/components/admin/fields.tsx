@@ -316,6 +316,50 @@ export function Grid({ children, cols = 2 }: { children: React.ReactNode; cols?:
 /** Storage bucket hint used by the image controls. */
 export const BUCKET = MEDIA_BUCKET;
 
+/* ── segmented choice ────────────────────────────────────────── */
+
+export function Segmented<T extends string>({
+  label,
+  hint,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  value: T;
+  options: { value: T; label: string }[];
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div className="border border-line bg-surface px-4 py-3.5">
+      <Label>{label}</Label>
+      {hint && <p className="mt-1 text-[12px] leading-snug text-muted">{hint}</p>}
+      <div className="mt-3 flex flex-wrap gap-2">
+        {options.map((o) => {
+          const active = o.value === value;
+          return (
+            <button
+              key={o.value}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onChange(o.value)}
+              className={cn(
+                "border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors duration-300",
+                active
+                  ? "border-gold/60 bg-gold/15 text-ink"
+                  : "border-line text-muted hover:border-gold/40 hover:text-ink",
+              )}
+            >
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /** Exposed so the editor can warn when the browser client is unavailable. */
 export function storageReady() {
   return Boolean(getSupabaseBrowserClient());
