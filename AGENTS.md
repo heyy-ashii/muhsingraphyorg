@@ -103,6 +103,10 @@ done
 - Admin editing lives in the **Site Content** tab of the dashboard
   (`src/components/admin/content-editor.tsx` + `fields.tsx`), saving through
   `saveSiteContent()` in `src/lib/admin.ts` (browser client, so RLS applies).
+- The **Moving banner** (the marquee `<Ticker>` under the hero) has a dedicated
+  panel in the editor for its words, speed, separator and a show/hide toggle
+  (`visibility.ticker`). That toggle is intentionally excluded from the generic
+  Section visibility panel so there is a single control for it.
 - **One-time setup**: if the `site_content` table is absent the public site uses
   defaults and the editor shows a setup notice instead of saving. Apply
   `supabase/site-content.sql` (idempotent) in the Supabase SQL Editor to enable
