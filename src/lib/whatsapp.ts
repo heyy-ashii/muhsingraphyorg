@@ -28,6 +28,14 @@ export function whatsappLink(message: string, phone: string = SITE.whatsappNumbe
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
 
+/**
+ * Opens WhatsApp for a bare phone number with no pre-filled message.
+ * Used where the number is the affordance itself (e.g. the footer credit).
+ */
+export function whatsappPhoneLink(phone: string): string {
+  return `https://wa.me/${phone.replace(/[^0-9]/g, "")}`;
+}
+
 export function artworkWhatsappLink(artwork: Artwork, artworkUrl?: string, phone?: string): string {
   return whatsappLink(buildArtworkMessage(artwork, artworkUrl), phone ?? SITE.whatsappNumber);
 }
