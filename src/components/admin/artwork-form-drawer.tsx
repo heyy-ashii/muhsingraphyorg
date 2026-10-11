@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { ImagePlus, LoaderCircle, X } from "lucide-react";
-import { ARTWORK_STATUSES, SCRIPT_STYLES, type Artwork, type ArtworkInput, type ArtworkStatus } from "@/lib/types";
+import { ARTWORK_STATUSES, SCRIPT_STYLES, galleryOf, type Artwork, type ArtworkInput, type ArtworkStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { uploadArtworkMedia } from "@/lib/admin";
+import { MediaGallery } from "./fields";
 
 interface Props {
   open: boolean;
@@ -27,7 +28,8 @@ interface Draft {
   is_featured: boolean;
   categories: string[];
   description: string;
-  image_url: string;
+  /** Full ordered gallery; the first entry is the cover. */
+  images: string[];
   in_situ_image_url: string;
 }
 
@@ -42,7 +44,7 @@ const EMPTY: Draft = {
   is_featured: false,
   categories: [],
   description: "",
-  image_url: "",
+  images: [],
   in_situ_image_url: "",
 };
 
@@ -53,12 +55,19 @@ const CATEGORY_OPTIONS = [
   "Monumental Scales",
 ];
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="mt-10 border-b border-line pb-2 font-mono text-[9px] uppercase tracking-[0.24em] text-gold first:mt-0">
+      {children}
+    </p>
+  );
+}
+
 export function ArtworkFormDrawer({ open, editing, nextOrder, onClose, onSubmit }: Props) {
   const [draft, setDraft] = useState<Draft>(EMPTY);
   const [busy, setBusy] = useState(false);
-  const [uploading, setUploading] = useState<"main" | "situ" | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const mainRef = useRef<HTMLInputElement>(null);
   const situRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -77,36 +86,37 @@ export function ArtworkFormDrawer({ open, editing, nextOrder, onClose, onSubmit 
             is_featured: editing.is_featured,
             categories: editing.categories ?? [],
             description: editing.description ?? "",
-            image_url: editing.image_url,
+            images: galleryOf(editing),
             in_situ_image_url: editing.in_situ_image_url ?? "",
           }
         : EMPTY,
     );
   }, [open, editing]);
 
-  async function pickFile(kind: "main" | "situ", file: File | undefined) {
+  async function pickSitu(file: File | undefined) {
     if (!file) return;
-    setUploading(kind);
+    setUploading(true);
     setError(null);
     try {
-      const url = await uploadArtworkMedia(file, kind === "main" ? "artworks" : "in-situ");
-      setDraft((d) => (kind === "main" ? { ...d, image_url: url } : { ...d, in_situ_image_url: url }));
+      const url = await uploadArtworkMedia(file, "in-situ");
+      setDraft((d) => ({ ...d, in_situ_image_url: url }));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed.");
     } finally {
-      setUploading(null);
+      setUploading(false);
     }
   }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!draft.image_url) {
-      setError("A main artwork image is required.");
+    if (!draft.images.length) {
+      setError("Add at least one photograph of the artwork.");
       return;
     }
     setBusy(true);
     setError(null);
 
+    const [cover, ...rest] = draft.images;
     const payload: ArtworkInput = {
       title: draft.title.trim(),
       title_arabic: draft.title_arabic.trim() || null,
@@ -118,7 +128,8 @@ export function ArtworkFormDrawer({ open, editing, nextOrder, onClose, onSubmit 
       is_featured: draft.is_featured,
       categories: draft.categories,
       description: draft.description.trim() || null,
-      image_url: draft.image_url,
+      image_url: cover,
+      images: rest,
       in_situ_image_url: draft.in_situ_image_url || null,
       display_order: editing?.display_order ?? nextOrder,
     };
@@ -176,49 +187,60 @@ export function ArtworkFormDrawer({ open, editing, nextOrder, onClose, onSubmit 
             </header>
 
             <form onSubmit={submit} className="flex-1 overflow-y-auto px-6 py-7 sm:px-8">
-              {/* media */}
-              <div className="grid grid-cols-2 gap-4">
-                {(
-                  [
-                    ["main", "Main artwork *", draft.image_url, mainRef],
-                    ["situ", "In-room preview", draft.in_situ_image_url, situRef],
-                  ] as const
-                ).map(([kind, label, value, ref]) => (
-                  <div key={kind}>
-                    <span className="eyebrow">{label}</span>
-                    <button
-                      type="button"
-                      onClick={() => ref.current?.click()}
-                      className="group relative mt-3 flex aspect-[4/5] w-full items-center justify-center overflow-hidden border border-dashed border-line bg-canvas-2/50 transition-colors hover:border-gold/50"
-                    >
-                      {value ? (
-                        <>
-                          <Image src={value} alt="" fill sizes="280px" className="object-cover" />
-                          <span className="absolute inset-0 flex items-center justify-center bg-ink/55 font-mono text-[9px] uppercase tracking-[0.2em] text-white opacity-0 transition-opacity group-hover:opacity-100">
-                            Replace
-                          </span>
-                        </>
-                      ) : uploading === kind ? (
-                        <LoaderCircle size={20} className="animate-spin text-gold" />
-                      ) : (
-                        <span className="flex flex-col items-center gap-2 text-muted">
-                          <ImagePlus size={20} />
-                          <span className="font-mono text-[9px] uppercase tracking-[0.18em]">Upload</span>
-                        </span>
-                      )}
-                    </button>
-                    <input
-                      ref={ref}
-                      type="file"
-                      accept="image/*"
-                      hidden
-                      onChange={(e) => pickFile(kind, e.target.files?.[0])}
-                    />
-                  </div>
-                ))}
+              <SectionLabel>Photography</SectionLabel>
+              <div className="mt-5">
+                <MediaGallery
+                  label="Artwork images"
+                  hint="Add several photographs — the full piece, then close-ups of different portions and angles. The first image is the cover shown in the gallery."
+                  images={draft.images}
+                  onChange={(next) => set("images", next)}
+                  folder="artworks"
+                />
               </div>
 
-              <div className="mt-9 grid grid-cols-1 gap-7 sm:grid-cols-2">
+              <div className="mt-7">
+                <span className="eyebrow">In-room preview (optional)</span>
+                <button
+                  type="button"
+                  onClick={() => situRef.current?.click()}
+                  className="group relative mt-3 flex aspect-[16/10] w-full items-center justify-center overflow-hidden border border-dashed border-line bg-canvas-2/50 transition-colors hover:border-gold/50"
+                >
+                  {draft.in_situ_image_url ? (
+                    <>
+                      <Image src={draft.in_situ_image_url} alt="" fill sizes="520px" className="object-cover" unoptimized />
+                      <span className="absolute inset-0 flex items-center justify-center bg-ink/55 font-mono text-[9px] uppercase tracking-[0.2em] text-white opacity-0 transition-opacity group-hover:opacity-100">
+                        Replace
+                      </span>
+                    </>
+                  ) : uploading ? (
+                    <LoaderCircle size={20} className="animate-spin text-gold" />
+                  ) : (
+                    <span className="flex flex-col items-center gap-2 text-muted">
+                      <ImagePlus size={20} />
+                      <span className="font-mono text-[9px] uppercase tracking-[0.18em]">Upload in-room shot</span>
+                    </span>
+                  )}
+                </button>
+                {draft.in_situ_image_url && (
+                  <button
+                    type="button"
+                    onClick={() => set("in_situ_image_url", "")}
+                    className="mt-2 font-mono text-[9px] uppercase tracking-[0.16em] text-muted transition-colors hover:text-red-500"
+                  >
+                    Remove in-room shot
+                  </button>
+                )}
+                <input
+                  ref={situRef}
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={(e) => void pickSitu(e.target.files?.[0])}
+                />
+              </div>
+
+              <SectionLabel>Identity</SectionLabel>
+              <div className="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <label className="block sm:col-span-2">
                   <span className="eyebrow">Title *</span>
                   <input required value={draft.title} onChange={(e) => set("title", e.target.value)} className="field mt-3" />
@@ -248,7 +270,10 @@ export function ArtworkFormDrawer({ open, editing, nextOrder, onClose, onSubmit 
                     ))}
                   </select>
                 </label>
+              </div>
 
+              <SectionLabel>Details</SectionLabel>
+              <div className="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <label className="block sm:col-span-2">
                   <span className="eyebrow">Medium description *</span>
                   <input
@@ -277,7 +302,8 @@ export function ArtworkFormDrawer({ open, editing, nextOrder, onClose, onSubmit 
                 </label>
               </div>
 
-              <div className="mt-8">
+              <SectionLabel>Curation</SectionLabel>
+              <div className="mt-5">
                 <span className="eyebrow">Status</span>
                 <div className="mt-3 inline-flex rounded-full border border-line p-0.5">
                   {ARTWORK_STATUSES.map((s) => (
@@ -296,7 +322,7 @@ export function ArtworkFormDrawer({ open, editing, nextOrder, onClose, onSubmit 
                 </div>
               </div>
 
-              <div className="mt-8">
+              <div className="mt-7">
                 <span className="eyebrow">Categories</span>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {CATEGORY_OPTIONS.map((c) => {
@@ -323,7 +349,7 @@ export function ArtworkFormDrawer({ open, editing, nextOrder, onClose, onSubmit 
                 </div>
               </div>
 
-              <label className="mt-8 flex items-center gap-3">
+              <label className="mt-7 flex items-center gap-3">
                 <button
                   type="button"
                   role="switch"
@@ -346,7 +372,7 @@ export function ArtworkFormDrawer({ open, editing, nextOrder, onClose, onSubmit 
                 </span>
               </label>
 
-              <label className="mt-8 block">
+              <label className="mt-7 block">
                 <span className="eyebrow">Curator note</span>
                 <textarea
                   rows={4}

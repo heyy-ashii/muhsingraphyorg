@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Maximize2, Minimize2, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2, X } from "lucide-react";
 import type { Artwork } from "@/lib/types";
+import { galleryOf } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AcquireButton } from "@/components/ui/whatsapp-button";
@@ -25,21 +26,37 @@ export function ArtworkModal({
   onClose: () => void;
 }) {
   const [view, setView] = useState<ViewMode>("artwork");
+  const [index, setIndex] = useState(0);
   const [lensOn, setLensOn] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0, bx: 50, by: 50 });
   const stageRef = useRef<HTMLDivElement>(null);
   const { contact } = useSiteContent();
 
+  const images = artwork ? galleryOf(artwork) : [];
+  const current = images[Math.min(index, images.length - 1)];
+  const many = images.length > 1;
+
   useEffect(() => {
     if (!artwork) return;
     setView("artwork");
+    setIndex(0);
     setLensOn(false);
   }, [artwork]);
+
+  const go = useCallback(
+    (dir: -1 | 1) => {
+      setIndex((i) => (i + dir + images.length) % images.length);
+      setLensOn(false);
+    },
+    [images.length],
+  );
 
   useEffect(() => {
     if (!artwork) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
+      if (e.key === "ArrowRight") go(1);
+      if (e.key === "ArrowLeft") go(-1);
     };
     document.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
@@ -48,7 +65,7 @@ export function ArtworkModal({
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
     };
-  }, [artwork, onClose]);
+  }, [artwork, onClose, go]);
 
   const onStageMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const el = stageRef.current;
@@ -137,7 +154,7 @@ export function ArtworkModal({
                 <AnimatePresence mode="wait">
                   {view === "artwork" ? (
                     <motion.div
-                      key="artwork"
+                      key={current}
                       initial={{ opacity: 0, scale: 1.03 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}
@@ -145,8 +162,8 @@ export function ArtworkModal({
                       className="relative h-full max-h-[74vh] w-full"
                     >
                       <Image
-                        src={artwork.image_url}
-                        alt={`${artwork.title} — ${artwork.script_style} calligraphy by Muhsin`}
+                        src={current}
+                        alt={`${artwork.title} — ${artwork.script_style} calligraphy by Muhsin (view ${index + 1})`}
                         fill
                         sizes="(max-width: 1024px) 100vw, 62vw"
                         priority
@@ -177,6 +194,31 @@ export function ArtworkModal({
                   )}
                 </AnimatePresence>
 
+                {/* gallery navigation */}
+                {many && view === "artwork" && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => go(-1)}
+                      aria-label="Previous image"
+                      className="absolute left-3 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/85 backdrop-blur-sm transition-colors hover:border-gold/60 hover:text-gold sm:left-5"
+                    >
+                      <ChevronLeft size={18} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => go(1)}
+                      aria-label="Next image"
+                      className="absolute right-3 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/85 backdrop-blur-sm transition-colors hover:border-gold/60 hover:text-gold sm:right-5"
+                    >
+                      <ChevronRight size={18} />
+                    </button>
+                    <span className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/20 bg-black/45 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.22em] text-white/80 backdrop-blur-sm">
+                      {index + 1} / {images.length}
+                    </span>
+                  </>
+                )}
+
                 {/* magnifier */}
                 <AnimatePresence>
                   {lensOn && view === "artwork" && (
@@ -191,7 +233,7 @@ export function ArtworkModal({
                         height: LENS,
                         left: pos.x - LENS / 2,
                         top: pos.y - LENS / 2,
-                        backgroundImage: `url(${artwork.image_url})`,
+                        backgroundImage: `url(${current})`,
                         backgroundSize: `${ZOOM * 100}%`,
                         backgroundPosition: `${pos.bx}% ${pos.by}%`,
                         backgroundRepeat: "no-repeat",
@@ -209,6 +251,30 @@ export function ArtworkModal({
                   {view === "artwork" ? "Hover to inspect stroke & gilding" : "Conceptual interior preview"}
                 </span>
               </div>
+
+              {/* thumbnail strip */}
+              {many && view === "artwork" && (
+                <div className="flex shrink-0 gap-3 overflow-x-auto border-t border-white/10 px-5 py-4 no-scrollbar sm:px-10">
+                  {images.map((src, i) => (
+                    <button
+                      key={`${src}-${i}`}
+                      type="button"
+                      onClick={() => {
+                        setIndex(i);
+                        setLensOn(false);
+                      }}
+                      aria-label={`Show image ${i + 1} of ${images.length}`}
+                      aria-current={i === index}
+                      className={cn(
+                        "relative h-16 w-16 shrink-0 overflow-hidden border transition-colors duration-300",
+                        i === index ? "border-gold" : "border-white/15 hover:border-gold/50",
+                      )}
+                    >
+                      <Image src={src} alt="" fill sizes="80px" className="object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* ── Curator dossier ───────────────────────────────── */}

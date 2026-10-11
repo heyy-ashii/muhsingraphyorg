@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Images } from "lucide-react";
 import type { Artwork } from "@/lib/types";
+import { galleryOf } from "@/lib/types";
 import { cn, pad } from "@/lib/utils";
 import { useSiteContent } from "@/lib/content/context";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -21,6 +23,7 @@ export interface ArtworkCardProps {
 
 export function ArtworkCard({ artwork, index, className, aspect = "aspect-[4/5]", onOpen }: ArtworkCardProps) {
   const { contact } = useSiteContent();
+  const gallery = galleryOf(artwork);
   const media = (
     <div className={cn("relative overflow-hidden bg-canvas-2", aspect)}>
       <Image
@@ -45,6 +48,13 @@ export function ArtworkCard({ artwork, index, className, aspect = "aspect-[4/5]"
       <span className="pointer-events-none absolute left-4 top-4 z-10">
         <StatusBadge status={artwork.status} size="sm" />
       </span>
+
+      {gallery.length > 1 && (
+        <span className="pointer-events-none absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-white/85 backdrop-blur-sm">
+          <Images size={11} />
+          {gallery.length}
+        </span>
+      )}
 
       <span className="pointer-events-none absolute bottom-4 left-4 z-10 font-mono text-[10px] uppercase tracking-[0.24em] text-white/0 transition-colors duration-700 group-hover/card:text-white/85">
         {artwork.script_style} · {artwork.year}

@@ -6,7 +6,7 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { MEDIA_BUCKET } from "@/lib/supabase/config";
 import { uploadArtworkMedia } from "@/lib/admin";
 import { cn } from "@/lib/utils";
-import { GripVertical, ImagePlus, LoaderCircle, Plus, Trash, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, GripVertical, ImagePlus, LoaderCircle, Plus, Trash, X } from "lucide-react";
 
 /* ── text inputs ─────────────────────────────────────────────── */
 
@@ -356,6 +356,139 @@ export function Segmented<T extends string>({
           );
         })}
       </div>
+    </div>
+  );
+}
+
+/* ── multi-image gallery editor ──────────────────────────────── */
+
+/**
+ * Uploads and orders the photographs that make up a single piece. The first
+ * image is the cover shown in the pavilion and cards; the rest appear in the
+ * public gallery as portions/angles. Reorder with the arrows, remove with the
+ * trash button, and drop in more with the upload control.
+ */
+export function MediaGallery({
+  label,
+  hint,
+  images,
+  onChange,
+  folder = "artworks",
+  max = 12,
+}: {
+  label: string;
+  hint?: string;
+  images: string[];
+  onChange: (next: string[]) => void;
+  folder?: "artworks" | "in-situ" | "brand" | "hero" | "atelier";
+  max?: number;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const list = images ?? [];
+
+  async function pick(files: FileList | null) {
+    if (!files?.length) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const room = Math.max(0, max - list.length);
+      const chosen = Array.from(files).slice(0, room);
+      const urls = await Promise.all(chosen.map((f) => uploadArtworkMedia(f, folder)));
+      onChange([...list, ...urls]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const move = (i: number, dir: -1 | 1) => {
+    const j = i + dir;
+    if (j < 0 || j >= list.length) return;
+    const next = [...list];
+    [next[i], next[j]] = [next[j], next[i]];
+    onChange(next);
+  };
+
+  return (
+    <div>
+      <div className="flex items-baseline justify-between gap-4">
+        <Label>{label}</Label>
+        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
+          {list.length} / {max}
+        </span>
+      </div>
+      {hint && <p className="mt-1.5 text-[12.5px] leading-relaxed text-muted">{hint}</p>}
+
+      <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
+        {list.map((src, i) => (
+          <div key={`${src}-${i}`} className="group relative aspect-square overflow-hidden border border-line bg-canvas-2">
+            <Image src={src} alt="" fill sizes="140px" className="object-cover" unoptimized />
+            {i === 0 && (
+              <span className="absolute left-1.5 top-1.5 rounded-full bg-gold/90 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.16em] text-ink">
+                Cover
+              </span>
+            )}
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-ink/70 px-1.5 py-1 opacity-0 transition-opacity group-hover:opacity-100">
+              <button
+                type="button"
+                onClick={() => move(i, -1)}
+                disabled={i === 0}
+                aria-label="Move earlier"
+                className="inline-flex h-6 w-6 items-center justify-center rounded-full text-white/85 transition-colors hover:text-gold disabled:opacity-25"
+              >
+                <ChevronLeft size={13} />
+              </button>
+              <button
+                type="button"
+                onClick={() => onChange(list.filter((_, xi) => xi !== i))}
+                aria-label="Remove image"
+                className="inline-flex h-6 w-6 items-center justify-center rounded-full text-white/85 transition-colors hover:text-red-400"
+              >
+                <Trash size={12} />
+              </button>
+              <button
+                type="button"
+                onClick={() => move(i, 1)}
+                disabled={i === list.length - 1}
+                aria-label="Move later"
+                className="inline-flex h-6 w-6 items-center justify-center rounded-full text-white/85 transition-colors hover:text-gold disabled:opacity-25"
+              >
+                <ChevronRight size={13} />
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {list.length < max && (
+          <button
+            type="button"
+            onClick={() => ref.current?.click()}
+            disabled={busy}
+            className="flex aspect-square flex-col items-center justify-center gap-2 border border-dashed border-line text-muted transition-colors hover:border-gold/50 hover:text-gold disabled:opacity-50"
+          >
+            {busy ? <LoaderCircle size={18} className="animate-spin text-gold" /> : <ImagePlus size={18} />}
+            <span className="font-mono text-[8px] uppercase tracking-[0.16em]">
+              {busy ? "Uploading" : "Add"}
+            </span>
+          </button>
+        )}
+      </div>
+
+      <input
+        ref={ref}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/avif"
+        multiple
+        hidden
+        onChange={(e) => {
+          void pick(e.target.files);
+          e.target.value = "";
+        }}
+      />
+      {error && <p className="mt-2 text-[11px] text-red-500">{error}</p>}
     </div>
   );
 }

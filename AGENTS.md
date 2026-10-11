@@ -84,6 +84,29 @@ done
   in `tailwind.config.ts`. Use token classes (`text-ink`, `bg-canvas`,
   `border-line`, `text-gold`) rather than raw hex.
 
+## Works gallery (multi-image)
+
+- **A piece's photographs are a list, not one URL.** `image_url` remains the
+  canonical cover (cards, hero, OG-image); the extra portions/angles live in the
+  nullable `images text[]` column. Read them through
+  `galleryOf(artwork)` in `src/lib/types.ts` — it always leads with the cover and
+  de-duplicates, so callers never special-case the cover.
+- **`images` is additive and optional.** Leave it out of `ArtworkInput` (or pass
+  `[]`) and everything still works; legacy rows without the column render a
+  single-image gallery. The public viewer and modal both collapse to the plain
+  stage when `galleryOf().length === 1`.
+- **Schema is idempotent.** `supabase/schema.sql` declares `images` on `create`
+  *and* carries an `alter table … add column if not exists` migration, so an
+  archive provisioned before this feature upgrades by re-running the file.
+- **Admin editing reuses `MediaGallery`** (`src/components/admin/fields.tsx`):
+  multi-select upload, arrow reordering, remove, and the first image labelled
+  "Cover". `ArtworkFormDrawer` splits the gallery into `[cover, ...rest]` when
+  saving, and shows a count badge in the artworks list.
+- **Public surfaces**: `artwork-detail-viewer.tsx` (own page) and
+  `artwork-modal.tsx` (pavilion + works index) share the same behaviour —
+  thumbnail strip, prev/next arrows, keyboard ← / →, and a `n / total` counter.
+  The card shows an `Images` count badge when a piece has more than one photo.
+
 ## Site content CMS (editable public copy)
 
 - The public site is **content-driven**. Every heading, paragraph, label, image,

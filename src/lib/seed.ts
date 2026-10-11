@@ -16,6 +16,11 @@ export const SEED_ARTWORKS: Artwork[] = [
     year: "2024",
     status: "Available",
     image_url: "/assets/artwork-01.jpg",
+    images: [
+      "/assets/artwork-01-detail-01.jpg",
+      "/assets/artwork-01-detail-02.jpg",
+      "/assets/artwork-01-detail-03.jpg",
+    ],
     in_situ_image_url: null,
     is_featured: true,
     display_order: 1,
