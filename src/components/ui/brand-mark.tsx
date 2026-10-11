@@ -1,23 +1,30 @@
+"use client";
+
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { useSiteContent } from "@/lib/content/context";
+import type { BrandCopy } from "@/lib/content/schema";
 
 interface BrandMarkProps {
   size?: number;
   className?: string;
   tone?: "ink" | "light" | "gold";
   priority?: boolean;
+  /** Overrides the content-driven source, e.g. for the studio portrait slot. */
+  src?: string;
 }
 
-const TONE_SRC = {
-  ink: "/assets/emblem-mark.png",
-  light: "/assets/emblem-light.png",
-  gold: "/assets/emblem-gold.png",
-} as const;
+function toneSrc(brand: BrandCopy, tone: NonNullable<BrandMarkProps["tone"]>) {
+  if (tone === "gold") return brand.logoGoldUrl;
+  if (tone === "light") return brand.logoLightUrl;
+  return brand.logoUrl;
+}
 
-export function BrandMark({ size = 40, className, tone = "ink", priority }: BrandMarkProps) {
+export function BrandMark({ size = 40, className, tone = "ink", priority, src }: BrandMarkProps) {
+  const { brand } = useSiteContent();
   return (
     <Image
-      src={TONE_SRC[tone]}
+      src={src || toneSrc(brand, tone) || "/assets/emblem-mark.png"}
       alt="محسن — Muhsin calligraphy emblem"
       width={size}
       height={size}

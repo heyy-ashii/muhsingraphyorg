@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Artwork } from "@/lib/types";
 import { cn, pad } from "@/lib/utils";
+import { useSiteContent } from "@/lib/content/context";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AcquireButton } from "@/components/ui/whatsapp-button";
 import { artworkWhatsappLink } from "@/lib/whatsapp";
@@ -19,6 +20,7 @@ export interface ArtworkCardProps {
 }
 
 export function ArtworkCard({ artwork, index, className, aspect = "aspect-[4/5]", onOpen }: ArtworkCardProps) {
+  const { contact } = useSiteContent();
   const media = (
     <div className={cn("relative overflow-hidden bg-canvas-2", aspect)}>
       <Image
@@ -99,7 +101,7 @@ export function ArtworkCard({ artwork, index, className, aspect = "aspect-[4/5]"
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <AcquireButton href={artworkWhatsappLink(artwork)} size="sm" />
+        <AcquireButton href={artworkWhatsappLink(artwork, undefined, contact.whatsappNumber)} size="sm" />
         <Link
           href={`/works/${artwork.id}`}
           className="btn-gold h-9 items-center px-4 font-mono text-[10px] uppercase tracking-[0.2em]"

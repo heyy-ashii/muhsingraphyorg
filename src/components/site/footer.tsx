@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { ArrowUp, Lock } from "lucide-react";
-import { SITE } from "@/lib/site";
+import { useSiteContent } from "@/lib/content/context";
 import { BrandLockup } from "@/components/ui/brand-lockup";
 import { BrandMark } from "@/components/ui/brand-mark";
 
 export function Footer() {
+  const { brand, contact, nav } = useSiteContent();
+
   const toTop = () => {
     const lenis = (window as unknown as { __lenis?: { scrollTo: (t: number, o?: object) => void } }).__lenis;
     if (lenis) lenis.scrollTo(0, { duration: 1.6 });
@@ -29,18 +31,18 @@ export function Footer() {
           <div>
             <BrandLockup size="md" />
             <p className="mt-7 max-w-[38ch] text-pretty text-[14.5px] leading-relaxed text-muted">
-              {SITE.description}
+              {brand.description}
             </p>
             <div className="gold-rule mt-8 max-w-[280px]" />
             <p className="mt-5 font-mono text-[9px] uppercase tracking-[0.22em] text-muted">
-              Archival authenticity · Every original released with a signed certificate
+              {brand.authenticity}
             </p>
           </div>
 
           <nav aria-label="Gallery">
             <p className="eyebrow">Gallery</p>
             <ul className="mt-6 space-y-3.5">
-              {SITE.nav.map((item) => (
+              {nav.map((item) => (
                 <li key={item.href}>
                   <a
                     href={item.href}
@@ -57,34 +59,34 @@ export function Footer() {
             <p className="eyebrow">Studio</p>
             <address className="mt-6 space-y-3.5 not-italic text-[14px] leading-relaxed text-muted">
               <p>
-                {SITE.studio.line1}
+                {contact.studioLine1}
                 <br />
-                {SITE.studio.city}, {SITE.studio.country}
+                {contact.city}, {contact.country}
               </p>
-              <p>{SITE.studio.line2}</p>
+              <p>{contact.studioLine2}</p>
               <p>
-                <a href={`mailto:${SITE.email}`} className="link-underline text-ink">
-                  {SITE.email}
+                <a href={`mailto:${contact.email}`} className="link-underline text-ink">
+                  {contact.email}
                 </a>
               </p>
               <p>
                 <a
-                  href={`https://wa.me/${SITE.whatsappNumber}`}
+                  href={`https://wa.me/${contact.whatsappNumber}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="link-underline text-ink"
                 >
-                  {SITE.whatsappDisplay}
+                  {contact.whatsappDisplay}
                 </a>
               </p>
               <p>
                 <a
-                  href={SITE.instagram}
+                  href={contact.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="link-underline text-ink"
                 >
-                  @muhsingraphy
+                  {contact.instagramHandle}
                 </a>
               </p>
             </address>
@@ -95,7 +97,7 @@ export function Footer() {
 
         <div className="flex flex-col items-center justify-between gap-6 py-8 sm:flex-row">
           <p className="font-mono text-[9px] uppercase tracking-[0.22em] text-muted">
-            © 2026 MUHSINGRAPHY — ALL RIGHTS RESERVED
+            {brand.copyright}
           </p>
 
           <div className="flex items-center gap-7">

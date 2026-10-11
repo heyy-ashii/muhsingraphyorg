@@ -8,6 +8,8 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/lib/site";
+import { getSiteContent } from "@/lib/content/load";
+import { SiteContentProvider } from "@/lib/content/context";
 import { ThemeProvider } from "@/components/site/theme-provider";
 import { SmoothScroll } from "@/components/site/smooth-scroll";
 import { GrainOverlay } from "@/components/site/grain-overlay";
@@ -48,44 +50,47 @@ const cinzel = Cinzel({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE.url),
-  title: {
-    default: `${SITE.name} — ${SITE.tagline}`,
-    template: `%s — ${SITE.name}`,
-  },
-  description: SITE.description,
-  applicationName: SITE.name,
-  authors: [{ name: "Muhsin" }],
-  keywords: [
-    "Arabic calligraphy",
-    "Islamic art",
-    "Thuluth",
-    "Diwani",
-    "Kufic",
-    "gold leaf art",
-    "fine art commission",
-    "Muhsingraphy",
-  ],
-  openGraph: {
-    title: `${SITE.name} — ${SITE.tagline}`,
-    description: SITE.description,
-    url: SITE.url,
-    siteName: SITE.name,
-    type: "website",
-    images: [{ url: "/assets/artwork-01.jpg", width: 1599, height: 1600, alt: "Calligraphy by Muhsin" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${SITE.name} — ${SITE.tagline}`,
-    description: SITE.description,
-  },
-  icons: {
-    icon: "/assets/emblem-mark.png",
-    apple: "/assets/apple-touch-icon.png",
-  },
-  robots: { index: true, follow: true },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { brand } = await getSiteContent();
+  return {
+    metadataBase: new URL(SITE.url),
+    title: {
+      default: `${brand.wordmark.charAt(0)}${brand.wordmark.slice(1).toLowerCase()} — ${brand.tagline}`,
+      template: `%s — ${brand.wordmark}`,
+    },
+    description: brand.description,
+    applicationName: brand.wordmark,
+    authors: [{ name: "Muhsin" }],
+    keywords: [
+      "Arabic calligraphy",
+      "Islamic art",
+      "Thuluth",
+      "Diwani",
+      "Kufic",
+      "gold leaf art",
+      "fine art commission",
+      "Muhsingraphy",
+    ],
+    openGraph: {
+      title: `${brand.wordmark} — ${brand.tagline}`,
+      description: brand.description,
+      url: SITE.url,
+      siteName: brand.wordmark,
+      type: "website",
+      images: [{ url: "/assets/artwork-01.jpg", width: 1599, height: 1600, alt: "Calligraphy by Muhsin" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${brand.wordmark} — ${brand.tagline}`,
+      description: brand.description,
+    },
+    icons: {
+      icon: brand.faviconUrl,
+      apple: "/assets/apple-touch-icon.png",
+    },
+    robots: { index: true, follow: true },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [
@@ -98,7 +103,8 @@ export const viewport: Viewport = {
 
 const themeBootstrap = `(function(){try{var t=localStorage.getItem('mhg-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}var r=document.documentElement;if(t==='dark'){r.classList.add('dark');r.style.colorScheme='dark';}else{r.classList.remove('dark');r.style.colorScheme='light';}}catch(e){}})();`;
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const content = await getSiteContent();
   return (
     <html
       lang="en"
@@ -109,9 +115,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
       </head>
       <body className="min-h-dvh bg-canvas text-ink antialiased">
-        <ThemeProvider>
-          <SmoothScroll>{children}</SmoothScroll>
-        </ThemeProvider>
+        <SiteContentProvider content={content}>
+          <ThemeProvider>
+            <SmoothScroll>{children}</SmoothScroll>
+          </ThemeProvider>
+        </SiteContentProvider>
         <GrainOverlay />
       </body>
     </html>

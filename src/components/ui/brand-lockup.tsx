@@ -1,6 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { SITE } from "@/lib/site";
+import { useSiteContent } from "@/lib/content/context";
 import { BrandMark } from "./brand-mark";
 
 interface BrandLockupProps {
@@ -22,7 +24,9 @@ export function BrandLockup({
   size = "md",
   showWordmark = true,
 }: BrandLockupProps) {
+  const { brand } = useSiteContent();
   const s = SIZES[size];
+  const title = brand.wordmark || "Muhsingraphy";
 
   const content = (
     <span className={cn("group inline-flex items-center gap-3", className)}>
@@ -41,15 +45,17 @@ export function BrandLockup({
               s.word,
             )}
           >
-            <span className="relative z-10">{SITE.wordmark}</span>
+            <span className="relative z-10">{title}</span>
             <span
               aria-hidden
               className="pointer-events-none absolute inset-0 -translate-x-full bg-gold-sheen bg-[length:220%_100%] opacity-0 transition-all duration-[1100ms] ease-silk group-hover:translate-x-0 group-hover:opacity-100"
             />
           </span>
-          <span className="mt-1 font-mono text-[8px] uppercase tracking-[0.3em] text-muted">
-            Atelier of Sacred Script
-          </span>
+          {brand.subtitle && (
+            <span className="mt-1 font-mono text-[8px] uppercase tracking-[0.3em] text-muted">
+              {brand.subtitle}
+            </span>
+          )}
         </span>
       )}
     </span>
@@ -57,7 +63,7 @@ export function BrandLockup({
 
   if (!href) return content;
   return (
-    <Link href={href} aria-label={`${SITE.wordmark} — home`} className="outline-none focus-visible:ring-1 focus-visible:ring-gold/60">
+    <Link href={href} aria-label={`${title} — home`} className="outline-none focus-visible:ring-1 focus-visible:ring-gold/60">
       {content}
     </Link>
   );

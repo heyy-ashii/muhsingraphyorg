@@ -1,4 +1,6 @@
-import { SITE } from "@/lib/site";
+"use client";
+
+import { useSiteContent } from "@/lib/content/context";
 
 function Diamond() {
   return (
@@ -11,8 +13,11 @@ function Diamond() {
 }
 
 export function Ticker() {
-  const items = SITE.ticker;
+  const { ticker } = useSiteContent();
+  const items = ticker?.length ? ticker : [];
   const loop = [...items, ...items, ...items];
+
+  if (!loop.length) return null;
 
   return (
     <section

@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import type { Artwork } from "@/lib/types";
 import { getArtworkById, getArtworks } from "@/lib/artworks";
 import { SITE } from "@/lib/site";
+import { getSiteContent } from "@/lib/content/load";
 import { artworkWhatsappLink } from "@/lib/whatsapp";
 import { Navbar } from "@/components/site/navbar";
 import { Footer } from "@/components/site/footer";
@@ -49,11 +50,11 @@ export async function generateMetadata({
 
 export default async function ArtworkPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [artwork, all] = await Promise.all([getArtworkById(id), getArtworks()]);
+  const [artwork, all, content] = await Promise.all([getArtworkById(id), getArtworks(), getSiteContent()]);
   if (!artwork) notFound();
 
   const related = all.filter((a) => a.id !== artwork.id).slice(0, 3);
-  const waHref = artworkWhatsappLink(artwork);
+  const waHref = artworkWhatsappLink(artwork, undefined, content.contact.whatsappNumber);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -129,7 +130,7 @@ export default async function ArtworkPage({ params }: { params: Promise<{ id: st
                 <div className="mt-9 space-y-4">
                   <AcquireButton href={waHref} size="lg" variant="solid" className="w-full rounded-full" />
                   <p className="text-center font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
-                    Opens WhatsApp · {SITE.whatsappDisplay} · No account required
+                                          Opens WhatsApp · {content.contact.whatsappDisplay} · No account required
                   </p>
                   <div className="gold-rule" />
                   <p className="text-[12.5px] leading-relaxed text-muted">

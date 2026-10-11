@@ -32,13 +32,17 @@ import {
   deleteInquiry,
   listArtworks,
   listInquiries,
+  loadSiteContent,
   reorderArtworks,
   setInquiryStatus,
   updateArtwork,
 } from "@/lib/admin";
+import type { SiteContent } from "@/lib/content/schema";
+import { DEFAULT_CONTENT } from "@/lib/content/defaults";
+import { ContentEditor } from "./content-editor";
 import { ArtworkFormDrawer } from "./artwork-form-drawer";
 
-type Tab = "artworks" | "inquiries";
+type Tab = "artworks" | "inquiries" | "content";
 
 const INQUIRY_TONE: Record<InquiryStatus, string> = {
   New: "border-gold/50 bg-gold/10 text-gold-deep dark:text-gold",
@@ -58,6 +62,8 @@ export function DashboardClient({ email }: { email: string }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editing, setEditing] = useState<Artwork | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
+  const [contentMissing, setContentMissing] = useState(false);
 
   const refresh = useCallback(async () => {
     if (!configured) {
@@ -81,6 +87,16 @@ export function DashboardClient({ email }: { email: string }) {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  useEffect(() => {
+    if (!configured) return;
+    loadSiteContent()
+      .then((result) => {
+        if (result) setContent(result);
+        else setContentMissing(true);
+      })
+      .catch(() => setContentMissing(true));
+  }, [configured]);
 
   const nextOrder = useMemo(
     () => (artworks.length ? Math.max(...artworks.map((a) => a.display_order)) + 1 : 1),
@@ -248,6 +264,7 @@ export function DashboardClient({ email }: { email: string }) {
             [
               ["artworks", `Artworks (${artworks.length})`],
               ["inquiries", `Commission Inquiries (${inquiries.length})`],
+              ["content", "Site Content"],
             ] as const
           ).map(([key, label]) => (
             <button
@@ -335,6 +352,12 @@ export function DashboardClient({ email }: { email: string }) {
               }
             }}
           />
+        )}
+
+        {tab === "content" && (
+          <div className="mt-8">
+            <ContentEditor initial={content} tableMissing={contentMissing} />
+          </div>
         )}
       </main>
 

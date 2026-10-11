@@ -3,13 +3,13 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Artwork } from "@/lib/types";
-import { CATEGORIES } from "@/lib/types";
 import { cn, pad } from "@/lib/utils";
+import { useSiteContent } from "@/lib/content/context";
+import { SECTION_INDEX } from "@/lib/content/defaults";
 import { SectionHeading } from "./section-heading";
 import { ArtworkCard } from "./artwork-card";
 import { ArtworkModal } from "./artwork-modal";
 import { MagneticCursor } from "./magnetic-cursor";
-import { SECTION } from "@/lib/site";
 
 /**
  * Staggered editorial layout: each piece receives a column span and vertical
@@ -25,9 +25,11 @@ const LAYOUT = [
 ];
 
 export function WorksPavilion({ artworks }: { artworks: Artwork[] }) {
+  const { works } = useSiteContent();
   const [active, setActive] = useState<string>("All");
   const [selected, setSelected] = useState<Artwork | null>(null);
 
+  const categories = works.categories?.length ? works.categories : ["All"];
   const filtered = useMemo(() => {
     if (active === "All") return artworks;
     return artworks.filter((a) => a.categories?.includes(active));
@@ -37,10 +39,10 @@ export function WorksPavilion({ artworks }: { artworks: Artwork[] }) {
     <section id="works" className="relative scroll-mt-28 py-24 sm:py-32">
       <div className="shell">
         <SectionHeading
-          index={SECTION.works}
-          eyebrow="Selected Works"
-          lines={["The pavilion.", "Original canvases."]}
-          description="A rotating selection of originals from the atelier. Every piece is unique — hand-inked, gilded where noted, and released with a certificate of authenticity."
+          index={SECTION_INDEX.works}
+          eyebrow={works.eyebrow}
+          lines={works.lines}
+          description={works.description}
           action={
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted">
               {pad(filtered.length, 2)} {filtered.length === 1 ? "piece" : "pieces"} on view
@@ -49,7 +51,7 @@ export function WorksPavilion({ artworks }: { artworks: Artwork[] }) {
         />
 
         <div className="mt-12 flex flex-wrap items-center gap-2.5">
-          {CATEGORIES.map((cat) => {
+          {categories.map((cat) => {
             const isActive = active === cat;
             return (
               <button

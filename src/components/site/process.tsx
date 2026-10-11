@@ -2,50 +2,28 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
-import { SECTION } from "@/lib/site";
+import { useSiteContent } from "@/lib/content/context";
+import { SECTION_INDEX } from "@/lib/content/defaults";
 import { SectionHeading } from "./section-heading";
 
-const STEPS = [
-  {
-    n: "I",
-    title: "Composition & Nuqta Geometry",
-    body: "The composition is set on paper before a single stroke of ink: the nuqta establishes the module, and every letter is measured against it. Ruling lines are drawn in graphite and left visible until the final burnish.",
-    meta: ["Graphite ruling", "Nuqta module", "Proportion study"],
-  },
-  {
-    n: "II",
-    title: "Rhythmic Inking & Stroke Harmony",
-    body: "Ink is laid in a single continuous rhythm — a lifted qalam leaves a scar in the line. Sittings are short and deliberate; a monumental panel can take eleven of them.",
-    meta: ["Continuous rhythm", "Lampblack ink", "Multiple sittings"],
-  },
-  {
-    n: "III",
-    title: "Gilding & Illumination",
-    body: "Gold is laid over organic size with a gilder's tip, then burnished with an agate. Illumination is added only where it clarifies a stroke — never where it merely decorates.",
-    meta: ["Organic size", "24k leaf", "Agate burnish"],
-  },
-  {
-    n: "IV",
-    title: "Archival Preservation & Framing",
-    body: "The finished canvas is sealed, documented and photographed for the archive, then framed to museum specification with UV-filtering glazing and an acid-free mount.",
-    meta: ["Archival seal", "Museum framing", "Certificate issued"],
-  },
-];
-
 export function Process() {
+  const { process: proc } = useSiteContent();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start 78%", "end 60%"] });
   const scaleY = useSpring(scrollYProgress, { stiffness: 90, damping: 26, mass: 0.5 });
   const glowY = useTransform(scaleY, (v) => `${v * 100}%`);
+  const steps = proc.steps ?? [];
+
+  if (!steps.length) return null;
 
   return (
     <section id="process" className="relative scroll-mt-28 py-24 sm:py-32">
       <div className="shell">
         <SectionHeading
-          index={SECTION.process}
-          eyebrow="Discipline & Methodology"
-          lines={["From blank sheet", "to archival canvas."]}
-          description="Every commission follows the same four movements. Nothing is expedited; the sequence is the craft."
+          index={SECTION_INDEX.process}
+          eyebrow={proc.eyebrow}
+          lines={proc.lines}
+          description={proc.description}
         />
 
         <div ref={ref} className="relative mt-20">
@@ -62,9 +40,9 @@ export function Process() {
           </div>
 
           <ol className="space-y-16 sm:space-y-24">
-            {STEPS.map((step, i) => (
+            {steps.map((step, i) => (
               <motion.li
-                key={step.n}
+                key={`${step.n}-${i}`}
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-14% 0px" }}
@@ -99,14 +77,16 @@ export function Process() {
                   <p className="mt-4 max-w-[62ch] text-pretty text-[15.5px] leading-relaxed text-muted">
                     {step.body}
                   </p>
-                  <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-3">
-                    {step.meta.map((m) => (
-                      <li key={m} className="flex items-center gap-2.5 font-mono text-[9px] uppercase tracking-[0.2em] text-ink-soft">
-                        <span aria-hidden className="h-px w-5 bg-gold/60" />
-                        {m}
-                      </li>
-                    ))}
-                  </ul>
+                  {step.meta?.length > 0 && (
+                    <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-3">
+                      {step.meta.map((m, mi) => (
+                        <li key={`${m}-${mi}`} className="flex items-center gap-2.5 font-mono text-[9px] uppercase tracking-[0.2em] text-ink-soft">
+                          <span aria-hidden className="h-px w-5 bg-gold/60" />
+                          {m}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </motion.li>
             ))}

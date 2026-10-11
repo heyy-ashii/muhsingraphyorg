@@ -2,68 +2,34 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { cn, pad } from "@/lib/utils";
-import { SECTION } from "@/lib/site";
+import { cn } from "@/lib/utils";
+import { useSiteContent } from "@/lib/content/context";
+import { SECTION_INDEX } from "@/lib/content/defaults";
 import { SectionHeading } from "./section-heading";
 
-const INSTRUMENTS = [
-  {
-    n: "I",
-    name: "The Qalam",
-    arabic: "القلم",
-    summary: "Hand-carved reed and bamboo pens, trimmed at precise angles.",
-    detail:
-      "Each qalam is cut from a single reed harvested in season, then trimmed and slit by hand to hold a fixed width. A nib trimmed at 32° writes Thuluth; a finer angle carries the hairline of Diwani. The pen is shaped for the letter it will write — never the reverse.",
-    meta: ["Reed & bamboo", "Hand-cut nib angle", "Re-trimmed between sittings"],
-  },
-  {
-    n: "II",
-    name: "The Inks",
-    arabic: "الحبر",
-    summary: "Hand-ground lampblack soot ink and natural mineral pigments.",
-    detail:
-      "Lampblack is collected, bound with gum arabic and ground on a stone slab until the ink holds a mirror. Mineral pigments — vermilion, lapis, ochre — are mulled in the studio so the colour reads as a substance rather than a tint.",
-    meta: ["Lampblack soot", "Gum arabic binder", "Stone-mulled minerals"],
-  },
-  {
-    n: "III",
-    name: "The Paper",
-    arabic: "الورق",
-    summary: "Traditional glazed Ahar paper and museum-grade Belgian linen.",
-    detail:
-      "Ahar paper is sized and burnished with an agate stone until the surface is glass-smooth, so the reed never tears. For monumental work the same preparation is carried onto Belgian linen primed to museum specification.",
-    meta: ["Ahar sizing", "Agate burnishing", "Belgian linen support"],
-  },
-  {
-    n: "IV",
-    name: "The Gilding",
-    arabic: "التذهيب",
-    summary: "24k Italian gold leaf, hand-applied with organic size.",
-    detail:
-      "Gold is beaten to a leaf thinner than a breath and laid over organic size with a gilder's tip. The result is not a shine but a depth — it shifts with the hour and refuses to photograph twice the same way.",
-    meta: ["24k Italian leaf", "Organic size", "Burnished by hand"],
-  },
-];
-
 export function Craft() {
+  const { craft } = useSiteContent();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const instruments = craft.instruments ?? [];
+
+  if (!instruments.length) return null;
 
   return (
     <section id="craft" className="relative scroll-mt-28 border-y border-line bg-canvas-2/40 py-24 sm:py-32">
       <div className="shell">
         <SectionHeading
-          index={SECTION.craft}
-          eyebrow="The Sacred Craft & Materials"
-          lines={["Four instruments.", "One discipline."]}
-          description="Nothing enters a Muhsingraphy canvas that was not chosen, prepared or ground in the atelier."
+          index={SECTION_INDEX.craft}
+          eyebrow={craft.eyebrow}
+          lines={craft.lines}
+          description={craft.description}
         />
 
         <div className="mt-16 grid grid-cols-1 gap-px overflow-hidden border border-line bg-line md:grid-cols-2 xl:grid-cols-4">
-          {INSTRUMENTS.map((item, i) => {
+          {instruments.map((item, i) => {
             const open = openIndex === i;
             return (
               <motion.button
-                key={item.name}
+                key={`${item.name}-${i}`}
                 type="button"
                 layout
                 onClick={() => setOpenIndex(open ? null : i)}
@@ -109,16 +75,18 @@ export function Craft() {
                   </motion.div>
                 </div>
 
-                <div className="mt-9">
-                  <ul className="space-y-2 border-t border-line pt-5">
-                    {item.meta.map((m) => (
-                      <li key={m} className="flex items-center gap-2.5 font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
-                        <span aria-hidden className="h-1 w-1 rotate-45 bg-gold" />
-                        {m}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {item.meta?.length > 0 && (
+                  <div className="mt-9">
+                    <ul className="space-y-2 border-t border-line pt-5">
+                      {item.meta.map((m, mi) => (
+                        <li key={`${m}-${mi}`} className="flex items-center gap-2.5 font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
+                          <span aria-hidden className="h-1 w-1 rotate-45 bg-gold" />
+                          {m}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </motion.button>
             );
           })}

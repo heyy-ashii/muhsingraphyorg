@@ -28,6 +28,6 @@ export function whatsappLink(message: string, phone: string = SITE.whatsappNumbe
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
 
-export function artworkWhatsappLink(artwork: Artwork, artworkUrl?: string): string {
-  return whatsappLink(buildArtworkMessage(artwork, artworkUrl));
+export function artworkWhatsappLink(artwork: Artwork, artworkUrl?: string, phone?: string): string {
+  return whatsappLink(buildArtworkMessage(artwork, artworkUrl), phone ?? SITE.whatsappNumber);
 }

@@ -10,7 +10,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { AcquireButton } from "@/components/ui/whatsapp-button";
 import { RoomPreview } from "./room-preview";
 import { buildArtworkMessage, whatsappLink } from "@/lib/whatsapp";
-import { SITE } from "@/lib/site";
+import { useSiteContent } from "@/lib/content/context";
 
 const LENS = 208;
 const ZOOM = 2.6;
@@ -28,6 +28,7 @@ export function ArtworkModal({
   const [lensOn, setLensOn] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0, bx: 50, by: 50 });
   const stageRef = useRef<HTMLDivElement>(null);
+  const { contact } = useSiteContent();
 
   useEffect(() => {
     if (!artwork) return;
@@ -64,7 +65,7 @@ export function ArtworkModal({
   }, []);
 
   const message = artwork ? buildArtworkMessage(artwork) : "";
-  const waHref = whatsappLink(message);
+  const waHref = whatsappLink(message, contact.whatsappNumber);
 
   return (
     <AnimatePresence>
@@ -261,7 +262,7 @@ export function ArtworkModal({
               <div className="mt-10 space-y-4">
                 <AcquireButton href={waHref} size="lg" variant="solid" className="w-full rounded-full" />
                 <p className="text-center font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
-                  Opens WhatsApp · {SITE.whatsappDisplay} · No account required
+                  Opens WhatsApp · {contact.whatsappDisplay} · No account required
                 </p>
                 <div className="gold-rule" />
                 <p className="text-center text-[11px] leading-relaxed text-muted">

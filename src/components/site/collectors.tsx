@@ -1,38 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { SECTION } from "@/lib/site";
-import { cn } from "@/lib/utils";
+import { useSiteContent } from "@/lib/content/context";
+import { SECTION_INDEX } from "@/lib/content/defaults";
 import { SectionHeading } from "./section-heading";
 
-const ENDORSEMENTS = [
-  {
-    quote:
-      "Muhsin does not decorate a wall — he gives it a centre of gravity. Our clients stand in front of the gilded panel for minutes without speaking.",
-    name: "Omar Al-Rashid",
-    role: "Curator, Meridian Gallery — Dubai",
-  },
-  {
-    quote:
-      "We commissioned a monumental Thuluth piece for a private residence. Three years later it is still the first thing every guest asks about.",
-    name: "Helena Ruiz",
-    role: "Private Collector — Madrid",
-  },
-  {
-    quote:
-      "The precision is architectural and the gesture is entirely human. That combination is extraordinarily rare in contemporary Islamic art.",
-    name: "Dr. Amara Okafor",
-    role: "Art Historian — London",
-  },
-  {
-    quote:
-      "Every stage was documented, every material accounted for. The archival dossier that arrived with the canvas was itself a work of care.",
-    name: "Kenji Watanabe",
-    role: "Collector — Tokyo",
-  },
-];
-
 export function Collectors() {
+  const { collectors } = useSiteContent();
+  const endorsements = collectors.endorsements ?? [];
+
+  if (!endorsements.length) return null;
+
   return (
     <section
       id="collectors"
@@ -44,23 +22,22 @@ export function Collectors() {
 
       <div className="shell">
         <SectionHeading
-          index={SECTION.collectors}
-          eyebrow="Collector Endorsements"
-          lines={["Words from", "the collections."]}
+          index={SECTION_INDEX.collectors}
+          eyebrow={collectors.eyebrow}
+          lines={collectors.lines}
+          description={collectors.description || undefined}
           align="center"
         />
 
         <div className="mt-16 grid grid-cols-1 gap-px overflow-hidden border border-line bg-line md:grid-cols-2">
-          {ENDORSEMENTS.map((item, i) => (
+          {endorsements.map((item, i) => (
             <motion.figure
-              key={item.name}
+              key={`${item.name}-${i}`}
               initial={{ opacity: 0, y: 34 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-10% 0px" }}
               transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1], delay: (i % 2) * 0.08 }}
-              className={cn(
-                "group relative flex flex-col justify-between bg-surface p-8 transition-colors duration-700 hover:bg-canvas sm:p-11",
-              )}
+              className="group relative flex flex-col justify-between bg-surface p-8 transition-colors duration-700 hover:bg-canvas sm:p-11"
             >
               <span
                 aria-hidden

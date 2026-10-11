@@ -122,3 +122,30 @@ drop policy if exists "artwork media curator delete" on storage.objects;
 create policy "artwork media curator delete"
   on storage.objects for delete to authenticated
   using (bucket_id = 'artwork-media');
+
+-- ── site_content ────────────────────────────────────────────────────────────
+-- Single-row JSONB document holding every editable string, image and visibility
+-- flag on the public site. One row (`id = 'default'`) keeps the editor simple and
+-- makes reads a single cheap fetch.
+create table if not exists public.site_content (
+  id          text primary key,
+  content     jsonb       not null default '{}'::jsonb,
+  updated_at  timestamptz not null default now()
+);
+
+alter table public.site_content enable row level security;
+
+drop policy if exists "site content public read" on public.site_content;
+create policy "site content public read"
+  on public.site_content for select to anon, authenticated using (true);
+
+drop policy if exists "site content curator insert" on public.site_content;
+create policy "site content curator insert"
+  on public.site_content for insert to authenticated with check (true);
+
+drop policy if exists "site content curator update" on public.site_content;
+create policy "site content curator update"
+  on public.site_content for update to authenticated using (true) with check (true);
+
+insert into public.site_content (id, content) values ('default', '{}'::jsonb)
+  on conflict (id) do nothing;

@@ -2,6 +2,8 @@
 
 import { getSupabaseBrowserClient } from "./supabase/client";
 import { MEDIA_BUCKET, isSupabaseConfigured } from "./supabase/config";
+import { coerceContent } from "./content/merge";
+import type { SiteContent } from "./content/schema";
 import type { Artwork, ArtworkInput, Inquiry, InquiryStatus } from "./types";
 
 export const ADMIN_NOT_CONFIGURED =
@@ -72,12 +74,50 @@ export async function deleteInquiry(id: string): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
+/* ── Site content ─────────────────────────────────────────── */
+
+/**
+ * Loads the editable site document for the admin editor.
+ *
+ * Returns `null` when the `site_content` table has not been created yet, so the
+ * dashboard can explain the one-time SQL step instead of showing a raw error.
+ */
+export async function loadSiteContent(): Promise<SiteContent | null> {
+  const { data, error } = await client()
+    .from("site_content")
+    .select("content")
+    .eq("id", "default")
+    .maybeSingle();
+  if (error) {
+    if (/does not exist|schema cache|relation/i.test(error.message)) return null;
+    throw new Error(error.message);
+  }
+  return coerceContent(data);
+}
+
+export async function saveSiteContent(content: SiteContent): Promise<void> {
+  const { error } = await client()
+    .from("site_content")
+    .upsert({ id: "default", content, updated_at: new Date().toISOString() }, { onConflict: "id" });
+  if (error) {
+    if (/does not exist|schema cache|relation/i.test(error.message)) {
+      throw new Error(
+        "The `site_content` table is missing. Run the site_content block from supabase/schema.sql in the Supabase SQL Editor, then retry.",
+      );
+    }
+    throw new Error(error.message);
+  }
+}
+
 /* ── Storage ──────────────────────────────────────────────── */
 
 const MAX_BYTES = 12 * 1024 * 1024;
 const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 
-export async function uploadArtworkMedia(file: File, folder: "artworks" | "in-situ" = "artworks") {
+export async function uploadArtworkMedia(
+  file: File,
+  folder: "artworks" | "in-situ" | "brand" | "hero" | "atelier" = "artworks",
+) {
   if (!ALLOWED.includes(file.type)) {
     throw new Error(`${file.name}: only JPEG, PNG, WebP or AVIF images are accepted.`);
   }

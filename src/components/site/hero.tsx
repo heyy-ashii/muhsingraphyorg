@@ -5,18 +5,22 @@ import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import type { Artwork } from "@/lib/types";
-import { SITE } from "@/lib/site";
+import { useSiteContent } from "@/lib/content/context";
 import { AmbientTilt, SplitLines } from "@/components/ui/motion-primitives";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AcquireButton } from "@/components/ui/whatsapp-button";
 import { artworkWhatsappLink } from "@/lib/whatsapp";
 
 export function Hero({ artwork }: { artwork: Artwork | null }) {
+  const { hero, brand } = useSiteContent();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const pieceY = useTransform(scrollYProgress, [0, 1], [0, -90]);
   const pieceScale = useTransform(scrollYProgress, [0, 1], [1, 1.06]);
   const copyY = useTransform(scrollYProgress, [0, 1], [0, 70]);
+
+  const heroImage = hero.imageUrl || artwork?.image_url || "/assets/artwork-01.jpg";
+  const heroLines = hero.headline?.length ? hero.headline : ["The quiet", "power of a", "single stroke."];
 
   return (
     <section
@@ -61,17 +65,13 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
             transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-wrap items-center gap-3"
           >
-            <span className="eyebrow">Portfolio · MMXXVI</span>
+            <span className="eyebrow">{hero.eyebrow}</span>
             <span className="h-px w-8 bg-gold/50" />
             <StatusBadge status="Available" size="sm" />
           </motion.div>
 
           <h1 className="mt-7 font-display text-display-xl text-ink">
-            <SplitLines
-              lines={["The quiet", "power of a", "single stroke."]}
-              lineClassName="italic"
-              delay={0}
-            />
+            <SplitLines lines={heroLines} lineClassName="italic" delay={0} />
           </h1>
 
           <motion.p
@@ -80,9 +80,7 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
             transition={{ duration: 1, delay: 0.85, ease: [0.22, 1, 0.36, 1] }}
             className="mt-7 max-w-[46ch] text-pretty text-[16px] leading-relaxed text-ink-soft sm:text-[17px]"
           >
-            Expressive calligraphy. Rich surfaces. A conversation between the mark and the
-            space it leaves behind — hand-inked and gilded at the atelier of{" "}
-            <span className="text-ink">Muhsin</span>.
+            {hero.body}
           </motion.p>
 
           <motion.div
@@ -95,7 +93,7 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
               href="#works"
               className="btn-ink h-[54px] rounded-full px-8 font-mono text-[11px] uppercase tracking-[0.24em]"
             >
-              <span>View Selected Works</span>
+              <span>{hero.ctaLabel}</span>
             </Link>
             {artwork && (
               <AcquireButton
@@ -107,23 +105,21 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
             )}
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1.3 }}
-            className="mt-14 flex flex-wrap items-center gap-x-10 gap-y-4 border-t border-line pt-6"
-          >
-            {[
-              ["Est. practice", "MMXIV"],
-              ["Collectors", "Across 14 countries"],
-              ["Studio", SITE.studio.city],
-            ].map(([k, v]) => (
-              <div key={k}>
-                <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-muted">{k}</p>
-                <p className="mt-1 font-display text-lg text-ink">{v}</p>
-              </div>
-            ))}
-          </motion.div>
+          {hero.stats?.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 1.3 }}
+              className="mt-14 flex flex-wrap items-center gap-x-10 gap-y-4 border-t border-line pt-6"
+            >
+              {hero.stats.map((stat) => (
+                <div key={stat.label}>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-muted">{stat.label}</p>
+                  <p className="mt-1 font-display text-lg text-ink">{stat.value}</p>
+                </div>
+              ))}
+            </motion.div>
+          )}
         </motion.div>
 
         {/* ── Hero piece with ambient tilt ─────────────────────── */}
@@ -141,7 +137,7 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
                 />
                 <div className="relative aspect-[4/5] overflow-hidden border border-line bg-canvas-2 shadow-gallery">
                   <Image
-                    src={artwork?.image_url ?? "/assets/artwork-01.jpg"}
+                    src={heroImage}
                     alt={artwork ? `${artwork.title} — calligraphy by Muhsin` : "Calligraphy by Muhsin"}
                     fill
                     priority
@@ -162,20 +158,20 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
                       </p>
                     </div>
                     <span className="font-arabic text-2xl text-white/80" dir="rtl">
-                      {SITE.arabicName}
+                      {brand.arabicName}
                     </span>
                   </div>
                 </div>
 
                 {/* floating plaque */}
                 <div className="glass absolute -bottom-8 -left-6 hidden w-[248px] rounded-sm p-5 sm:block">
-                  <p className="eyebrow">Atelier status</p>
+                  <p className="eyebrow">{hero.plaqueEyebrow}</p>
                   <p className="mt-2 font-display text-[22px] leading-tight text-ink">
-                    Studio open for select commissions
+                    {hero.plaqueTitle}
                   </p>
                   <div className="gold-rule my-3" />
                   <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
-                    Two slots · MMXXVI season
+                    {hero.plaqueNote}
                   </p>
                 </div>
               </div>

@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { SITE } from "@/lib/site";
+import { useSiteContent } from "@/lib/content/context";
 import { cn } from "@/lib/utils";
 import { BrandLockup } from "@/components/ui/brand-lockup";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function Navbar() {
+  const { nav, contact } = useSiteContent();
   const { scrollY } = useScroll();
   const [condensed, setCondensed] = useState(false);
   const [open, setOpen] = useState(false);
@@ -39,7 +40,7 @@ export function Navbar() {
           <BrandLockup size="sm" />
 
           <ul className="hidden items-center gap-8 lg:flex">
-            {SITE.nav.map((item) => (
+            {nav.map((item) => (
               <li key={item.href}>
                 <a
                   href={item.href}
@@ -83,7 +84,7 @@ export function Navbar() {
           >
             <div className="flex h-full flex-col justify-center px-8 pb-24">
               <ul className="space-y-2">
-                {SITE.nav.map((item, i) => (
+                {nav.map((item, i) => (
                   <motion.li
                     key={item.href}
                     initial={{ opacity: 0, x: -24 }}
@@ -116,7 +117,7 @@ export function Navbar() {
                   <span>Commission Work</span>
                 </Link>
                 <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.24em] text-muted">
-                  {SITE.whatsappDisplay} · {SITE.studio.city}
+                  {contact.whatsappDisplay} · {contact.city}
                 </p>
               </motion.div>
             </div>

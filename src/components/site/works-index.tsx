@@ -3,8 +3,8 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Artwork } from "@/lib/types";
-import { CATEGORIES } from "@/lib/types";
 import { cn, pad } from "@/lib/utils";
+import { useSiteContent } from "@/lib/content/context";
 import { ArtworkCard } from "./artwork-card";
 import { ArtworkModal } from "./artwork-modal";
 import { MagneticCursor } from "./magnetic-cursor";
@@ -19,9 +19,11 @@ const LAYOUT = [
 ];
 
 export function WorksIndex({ artworks }: { artworks: Artwork[] }) {
+  const { works } = useSiteContent();
   const [active, setActive] = useState<string>("All");
   const [selected, setSelected] = useState<Artwork | null>(null);
 
+  const categories = works.categories?.length ? works.categories : ["All"];
   const filtered = useMemo(
     () => (active === "All" ? artworks : artworks.filter((a) => a.categories?.includes(active))),
     [artworks, active],
@@ -30,7 +32,7 @@ export function WorksIndex({ artworks }: { artworks: Artwork[] }) {
   return (
     <div>
       <div className="flex flex-wrap items-center gap-2.5">
-        {CATEGORIES.map((cat) => {
+        {categories.map((cat) => {
           const isActive = active === cat;
           return (
             <button

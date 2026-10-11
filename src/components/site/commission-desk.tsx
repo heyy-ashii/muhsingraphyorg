@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Check, LoaderCircle } from "lucide-react";
-import { SECTION, SITE } from "@/lib/site";
-import { COMMISSION_TYPES } from "@/lib/types";
+import { useSiteContent } from "@/lib/content/context";
+import { SECTION_INDEX } from "@/lib/content/defaults";
 import { buildGeneralMessage, whatsappLink } from "@/lib/whatsapp";
 import { SectionHeading } from "./section-heading";
 import { AcquireButton, InstagramIcon, WhatsAppIcon } from "@/components/ui/whatsapp-button";
@@ -13,8 +13,12 @@ import { Reveal } from "@/components/ui/motion-primitives";
 type State = "idle" | "sending" | "sent" | "error";
 
 export function CommissionDesk() {
+  const { commissions, contact } = useSiteContent();
   const [state, setState] = useState<State>("idle");
   const [error, setError] = useState<string | null>(null);
+  const types = commissions.commissionTypes?.length
+    ? commissions.commissionTypes
+    : ["Private Commission"];
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -48,10 +52,10 @@ export function CommissionDesk() {
     <section id="commissions" className="relative scroll-mt-28 py-24 sm:py-32">
       <div className="shell">
         <SectionHeading
-          index={SECTION.commissions}
-          eyebrow="Bespoke Commission Desk"
-          lines={["Commission a", "piece of your own."]}
-          description="Private commissions are accepted in limited number each season. Share the space, the scale and the intention — Muhsin will respond personally with a proposal, timeline and material options."
+          index={SECTION_INDEX.commissions}
+          eyebrow={commissions.eyebrow}
+          lines={commissions.lines}
+          description={commissions.description}
         />
 
         <div className="mt-16 grid grid-cols-1 gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
@@ -70,10 +74,9 @@ export function CommissionDesk() {
                   <span className="flex h-14 w-14 items-center justify-center rounded-full border border-gold/50 text-gold">
                     <Check size={22} />
                   </span>
-                  <h3 className="mt-6 font-display text-3xl text-ink">Enquiry received</h3>
+                  <h3 className="mt-6 font-display text-3xl text-ink">{commissions.successTitle}</h3>
                   <p className="mt-3 max-w-[40ch] text-[15px] leading-relaxed text-muted">
-                    Thank you. Your commission request is now with the atelier. Muhsin replies to
-                    every enquiry personally, usually within two working days.
+                    {commissions.successBody}
                   </p>
                   <button
                     type="button"
@@ -120,8 +123,8 @@ export function CommissionDesk() {
 
                   <label className="block">
                     <span className="eyebrow">Nature of commission</span>
-                    <select name="commission_type" defaultValue={COMMISSION_TYPES[0]} className="field mt-3 bg-transparent">
-                      {COMMISSION_TYPES.map((t) => (
+                    <select name="commission_type" defaultValue={types[0]} className="field mt-3 bg-transparent">
+                      {types.map((t) => (
                         <option key={t} value={t} className="bg-surface text-ink">
                           {t}
                         </option>
@@ -181,22 +184,19 @@ export function CommissionDesk() {
                 />
                 <p className="eyebrow">Direct line</p>
                 <p className="mt-4 font-display text-[clamp(2rem,3.6vw,2.8rem)] leading-none text-ink">
-                  {SITE.whatsappDisplay}
+                  {contact.whatsappDisplay}
                 </p>
-                <p className="mt-3 text-[14px] leading-relaxed text-muted">
-                  Prefer to speak directly? Message the atelier on WhatsApp for immediate
-                  availability, pricing and shipping.
-                </p>
+                <p className="mt-3 text-[14px] leading-relaxed text-muted">{commissions.directNote}</p>
                 <div className="mt-7 flex flex-wrap gap-3">
                   <AcquireButton
-                    href={whatsappLink(buildGeneralMessage("a private commission"))}
+                    href={whatsappLink(buildGeneralMessage("a private commission"), contact.whatsappNumber)}
                     label="Chat on WhatsApp"
                     size="md"
                     variant="solid"
                     className="rounded-full"
                   />
                   <a
-                    href={`mailto:${SITE.email}`}
+                    href={`mailto:${contact.email}`}
                     className="btn-gold h-11 rounded-full px-6 font-mono text-[11px] uppercase tracking-[0.22em]"
                   >
                     <span>Email the atelier</span>
@@ -207,7 +207,7 @@ export function CommissionDesk() {
 
             <Reveal delay={0.1}>
               <a
-                href={SITE.instagram}
+                href={contact.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-center justify-between border border-line bg-surface p-7 transition-colors duration-700 hover:border-gold/40 sm:p-9"
@@ -215,7 +215,7 @@ export function CommissionDesk() {
                 <span className="flex items-center gap-5">
                   <InstagramIcon className="text-gold" />
                   <span>
-                    <span className="block font-display text-2xl text-ink">@muhsingraphy</span>
+                    <span className="block font-display text-2xl text-ink">{contact.instagramHandle}</span>
                     <span className="mt-1 block font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
                       Studio journal & works in progress
                     </span>
@@ -234,21 +234,21 @@ export function CommissionDesk() {
                 <dl className="mt-5 space-y-4 text-[14px] leading-relaxed text-ink-soft">
                   <div className="flex justify-between gap-6 border-b border-line pb-3">
                     <dt className="text-muted">Atelier</dt>
-                    <dd className="text-right">{SITE.studio.line1}</dd>
+                    <dd className="text-right">{contact.studioLine1}</dd>
                   </div>
                   <div className="flex justify-between gap-6 border-b border-line pb-3">
                     <dt className="text-muted">Visits</dt>
-                    <dd className="text-right">{SITE.studio.line2}</dd>
+                    <dd className="text-right">{contact.studioLine2}</dd>
                   </div>
                   <div className="flex justify-between gap-6">
                     <dt className="text-muted">Enquiries</dt>
-                    <dd className="text-right">{SITE.email}</dd>
+                    <dd className="text-right">{contact.email}</dd>
                   </div>
                 </dl>
                 <div className="mt-6 flex items-center gap-3 border-t border-line pt-5">
                   <WhatsAppIcon className="text-gold" />
                   <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
-                    Worldwide insured shipping · Certificate of authenticity
+                    {commissions.shippingNote}
                   </p>
                 </div>
               </div>

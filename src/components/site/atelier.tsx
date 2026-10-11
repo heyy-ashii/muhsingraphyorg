@@ -3,33 +3,13 @@
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
-import { SECTION, SITE } from "@/lib/site";
+import { useSiteContent } from "@/lib/content/context";
+import { SECTION_INDEX } from "@/lib/content/defaults";
 import { SectionHeading } from "./section-heading";
 import { Counter, Reveal } from "@/components/ui/motion-primitives";
 
-const METRICS = [
-  { to: 18, suffix: "+", label: "Years of study" },
-  { to: 240, suffix: "+", label: "Global collectors" },
-  { to: 14, suffix: "", label: "Countries" },
-  { to: 60, suffix: "+", label: "Custom installations" },
-];
-
-const PHILOSOPHY = [
-  {
-    title: "The nuqta as measure",
-    body: "Every proportion in the atelier is derived from a single diamond dot of the qalam. Nothing is drawn by eye alone.",
-  },
-  {
-    title: "Materials that age well",
-    body: "Hand-ground lampblack soot, mineral pigment, Ahar-glazed paper and Belgian linen — chosen for centuries, not seasons.",
-  },
-  {
-    title: "Restraint over ornament",
-    body: "The gilding illuminates a stroke; it never competes with it. Negative space is treated as a material.",
-  },
-];
-
 export function Atelier() {
+  const { atelier, brand } = useSiteContent();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const imageY = useTransform(scrollYProgress, [0, 1], [60, -60]);
@@ -42,10 +22,10 @@ export function Atelier() {
 
       <div className="shell">
         <SectionHeading
-          index={SECTION.atelier}
-          eyebrow="Atelier Muhsin"
-          lines={["A practice in line,", "space and texture."]}
-          description="Muhsin works from a private studio in Fort Kochi, writing in the classical disciplines while pushing them into contemporary scale. Each canvas passes through his hands alone — composition, inking, gilding and finishing."
+          index={SECTION_INDEX.atelier}
+          eyebrow={atelier.eyebrow}
+          lines={atelier.lines}
+          description={atelier.description}
         />
 
         <div ref={ref} className="mt-20 grid grid-cols-1 gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
@@ -54,7 +34,7 @@ export function Atelier() {
             <Reveal>
               <div className="relative aspect-[4/5] overflow-hidden border border-line bg-canvas-2 shadow-gallery">
                 <Image
-                  src="/assets/artwork-01.jpg"
+                  src={atelier.imageUrl || "/assets/artwork-01.jpg"}
                   alt="Muhsin at the atelier, working a calligraphic composition"
                   fill
                   sizes="(max-width: 1024px) 100vw, 42vw"
@@ -66,62 +46,64 @@ export function Atelier() {
                 />
                 <div className="absolute inset-x-0 bottom-0 p-6">
                   <p className="font-arabic text-3xl text-white/90" dir="rtl">
-                    {SITE.arabicName}
+                    {brand.arabicName}
                   </p>
                   <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.24em] text-white/70">
-                    Master calligrapher · Fort Kochi, India
+                    {atelier.imageCaption}
                   </p>
                 </div>
               </div>
             </Reveal>
 
-            <Reveal delay={0.15} className="mt-6">
-              <blockquote className="border-l border-gold/40 pl-5">
-                <p className="font-display text-[22px] italic leading-snug text-ink">
-                  &ldquo;A letter is not finished when it is beautiful. It is finished when it is
-                  inevitable.&rdquo;
-                </p>
-                <footer className="mt-3 font-mono text-[9px] uppercase tracking-[0.22em] text-muted">
-                  Muhsin — studio note, MMXXIV
-                </footer>
-              </blockquote>
-            </Reveal>
+            {atelier.quote && (
+              <Reveal delay={0.15} className="mt-6">
+                <blockquote className="border-l border-gold/40 pl-5">
+                  <p className="font-display text-[22px] italic leading-snug text-ink">
+                    &ldquo;{atelier.quote}&rdquo;
+                  </p>
+                  <footer className="mt-3 font-mono text-[9px] uppercase tracking-[0.22em] text-muted">
+                    {atelier.quoteAttribution}
+                  </footer>
+                </blockquote>
+              </Reveal>
+            )}
           </motion.div>
 
           {/* philosophy + metrics */}
           <div>
-            <Reveal>
-              <p className="text-pretty text-[17px] leading-relaxed text-ink-soft">
-                Trained through two decades of classical study across Thuluth, Jali Diwani and
-                Kufic, Muhsin treats calligraphy as an architectural discipline. His canvases
-                hold the movement of a single breath while remaining structurally exact — the
-                tension between rigour and gesture is the whole practice.
-              </p>
-            </Reveal>
+            {atelier.intro && (
+              <Reveal>
+                <p className="text-pretty text-[17px] leading-relaxed text-ink-soft">{atelier.intro}</p>
+              </Reveal>
+            )}
 
-            <div className="mt-12 divide-y divide-line border-y border-line">
-              {PHILOSOPHY.map((item, i) => (
-                <Reveal key={item.title} delay={0.08 * i}>
-                  <div className="grid grid-cols-1 gap-3 py-6 sm:grid-cols-[180px_1fr] sm:gap-8">
-                    <h3 className="font-display text-[21px] leading-tight text-ink">{item.title}</h3>
-                    <p className="text-pretty text-[14.5px] leading-relaxed text-muted">{item.body}</p>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
+            {atelier.philosophy?.length > 0 && (
+              <div className="mt-12 divide-y divide-line border-y border-line">
+                {atelier.philosophy.map((item, i) => (
+                  <Reveal key={`${item.title}-${i}`} delay={0.08 * i}>
+                    <div className="grid grid-cols-1 gap-3 py-6 sm:grid-cols-[180px_1fr] sm:gap-8">
+                      <h3 className="font-display text-[21px] leading-tight text-ink">{item.title}</h3>
+                      <p className="text-pretty text-[14.5px] leading-relaxed text-muted">{item.body}</p>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+            )}
 
-            <div className="mt-12 grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
-              {METRICS.map((m, i) => (
-                <Reveal key={m.label} delay={0.06 * i}>
-                  <p className="font-display text-[clamp(2.4rem,5vw,3.6rem)] leading-none text-ink">
-                    <Counter to={m.to} suffix={m.suffix} />
-                  </p>
-                  <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.22em] text-muted">
-                    {m.label}
-                  </p>
-                </Reveal>
-              ))}
-            </div>
+            {atelier.metrics?.length > 0 && (
+              <div className="mt-12 grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
+                {atelier.metrics.map((m, i) => (
+                  <Reveal key={`${m.label}-${i}`} delay={0.06 * i}>
+                    <p className="font-display text-[clamp(2.4rem,5vw,3.6rem)] leading-none text-ink">
+                      <Counter to={m.value} suffix={m.suffix} />
+                    </p>
+                    <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.22em] text-muted">
+                      {m.label}
+                    </p>
+                  </Reveal>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
