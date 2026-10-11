@@ -84,6 +84,30 @@ done
   in `tailwind.config.ts`. Use token classes (`text-ink`, `bg-canvas`,
   `border-line`, `text-gold`) rather than raw hex.
 
+## Site content CMS (editable public copy)
+
+- The public site is **content-driven**. Every heading, paragraph, label, image,
+  logo and section visibility is read from a single JSON document in the
+  Supabase `site_content` table (one row, `id = 'default'`).
+- **Nav and footer chrome are intentionally fixed** — only the content *within*
+  them (brand, contact) is editable. There is no control for the nav links.
+- Files: `src/lib/content/{schema,defaults,merge,load,context,index}.ts`.
+  `defaults.ts` is the canonical copy; `merge.ts#coerceContent` deep-merges any
+  stored document over the defaults so a partial or older document still
+  renders a complete site.
+- `getSiteContent()` (`load.ts`) is `cache`-wrapped and **never throws**: a
+  missing table, missing row or unconfigured project falls back to defaults.
+  This keeps the gallery rendering before the SQL has been applied.
+- Client components (navbar, footer, cards, modal) read content via
+  `useSiteContent()` from `context.tsx`, provided in `src/app/layout.tsx`.
+- Admin editing lives in the **Site Content** tab of the dashboard
+  (`src/components/admin/content-editor.tsx` + `fields.tsx`), saving through
+  `saveSiteContent()` in `src/lib/admin.ts` (browser client, so RLS applies).
+- **One-time setup**: if the `site_content` table is absent the public site uses
+  defaults and the editor shows a setup notice instead of saving. Apply
+  `supabase/site-content.sql` (idempotent) in the Supabase SQL Editor to enable
+  saving. That needs a Supabase Management PAT, which is not stored in this repo.
+
 ## Layout
 
 ```
