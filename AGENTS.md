@@ -88,6 +88,14 @@ done
   re-inventing status chips. Only one tab panel renders at a time — do not go
   back to the old `tab === "x" ? … : <default>` shape that leaked one panel
   under every other tab.
+- **The dashboard shell is viewport-locked, not page-scrolled.** The shell is
+  `h-dvh overflow-hidden` and only the content column scrolls; the rail stays a
+  fixed height at every width (it collapses to a header on mobile). Both scroll
+  regions carry `data-lenis-prevent` so the global Lenis smooth scroll leaves
+  them alone. The Site Content save bar is `sticky bottom-0` inside the content
+  column — it must never become `fixed`/`inset-x-0`, which would span under the
+  rail. Anything taller than the viewport (like the content editor) relies on
+  this, so do not reintroduce `min-h-dvh` on the shell.
 - **The dashboard keeps its own light/dark toggle.** It reuses the shared
   `ThemeToggle` (`src/components/ui/theme-toggle.tsx`) — once in the sidebar
   ("Appearance") and once in the mobile header. Both drive the same

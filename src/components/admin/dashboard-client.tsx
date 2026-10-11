@@ -216,10 +216,13 @@ export function DashboardClient({
   };
 
   return (
-    <div className="min-h-dvh bg-canvas-2/50">
-      <div className="mx-auto flex min-h-dvh w-full max-w-[1480px] flex-col lg:flex-row">
+    <div className="h-dvh overflow-hidden bg-canvas-2/50">
+      <div className="mx-auto flex h-dvh w-full max-w-[1480px] flex-col overflow-hidden lg:flex-row">
         {/* ── sidebar ─────────────────────────────────────────── */}
-        <aside className="flex shrink-0 flex-col gap-6 border-line px-5 py-6 lg:w-[264px] lg:border-r lg:px-6 lg:py-8">
+        <aside
+          data-lenis-prevent
+          className="flex shrink-0 flex-col gap-6 border-line px-5 py-6 lg:w-[264px] lg:overflow-y-auto lg:border-r lg:px-6 lg:py-8"
+        >
           <Link href="/" className="inline-flex">
             <BrandLockup size="sm" />
           </Link>
@@ -300,7 +303,15 @@ export function DashboardClient({
         </aside>
 
         {/* ── content ─────────────────────────────────────────── */}
-        <div className="min-w-0 flex-1 px-5 py-7 sm:px-8 sm:py-10">
+        <div
+          data-lenis-prevent
+          className={cn(
+            "min-h-0 min-w-0 flex-1 overflow-y-auto px-5 pt-7 sm:px-8 sm:pt-10 lg:flex lg:flex-col",
+            // The Site Content editor docks its own save bar to the bottom edge,
+            // so it needs no bottom padding of its own.
+            tab === "content" ? "pb-0" : "pb-7 sm:pb-10",
+          )}
+        >
           <header className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <h1 className="font-display text-[clamp(1.9rem,3.2vw,2.6rem)] leading-none text-ink">
@@ -375,7 +386,7 @@ export function DashboardClient({
             </div>
           )}
 
-          <div className="mt-7">
+          <div className="mt-7 lg:flex lg:flex-1 lg:flex-col">
             {loading ? (
               <div className="flex min-h-[320px] items-center justify-center">
                 <LoaderCircle size={22} className="animate-spin text-gold" />
