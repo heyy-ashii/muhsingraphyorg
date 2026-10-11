@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ImagePlus, LoaderCircle, X } from "lucide-react";
+import { LoaderCircle, X } from "lucide-react";
 import { ARTWORK_STATUSES, SCRIPT_STYLES, galleryOf, type Artwork, type ArtworkInput, type ArtworkStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { uploadArtworkMedia } from "@/lib/admin";
 import { MediaGallery } from "./fields";
 
 interface Props {
@@ -30,7 +28,6 @@ interface Draft {
   description: string;
   /** Full ordered gallery; the first entry is the cover. */
   images: string[];
-  in_situ_image_url: string;
 }
 
 const EMPTY: Draft = {
@@ -45,7 +42,6 @@ const EMPTY: Draft = {
   categories: [],
   description: "",
   images: [],
-  in_situ_image_url: "",
 };
 
 const CATEGORY_OPTIONS = [
@@ -66,9 +62,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export function ArtworkFormDrawer({ open, editing, nextOrder, onClose, onSubmit }: Props) {
   const [draft, setDraft] = useState<Draft>(EMPTY);
   const [busy, setBusy] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const situRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -87,25 +81,10 @@ export function ArtworkFormDrawer({ open, editing, nextOrder, onClose, onSubmit 
             categories: editing.categories ?? [],
             description: editing.description ?? "",
             images: galleryOf(editing),
-            in_situ_image_url: editing.in_situ_image_url ?? "",
           }
         : EMPTY,
     );
   }, [open, editing]);
-
-  async function pickSitu(file: File | undefined) {
-    if (!file) return;
-    setUploading(true);
-    setError(null);
-    try {
-      const url = await uploadArtworkMedia(file, "in-situ");
-      setDraft((d) => ({ ...d, in_situ_image_url: url }));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed.");
-    } finally {
-      setUploading(false);
-    }
-  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -130,7 +109,6 @@ export function ArtworkFormDrawer({ open, editing, nextOrder, onClose, onSubmit 
       description: draft.description.trim() || null,
       image_url: cover,
       images: rest,
-      in_situ_image_url: draft.in_situ_image_url || null,
       display_order: editing?.display_order ?? nextOrder,
     };
 
@@ -195,47 +173,6 @@ export function ArtworkFormDrawer({ open, editing, nextOrder, onClose, onSubmit 
                   images={draft.images}
                   onChange={(next) => set("images", next)}
                   folder="artworks"
-                />
-              </div>
-
-              <div className="mt-7">
-                <span className="eyebrow">In-room preview (optional)</span>
-                <button
-                  type="button"
-                  onClick={() => situRef.current?.click()}
-                  className="group relative mt-3 flex aspect-[16/10] w-full items-center justify-center overflow-hidden border border-dashed border-line bg-canvas-2/50 transition-colors hover:border-gold/50"
-                >
-                  {draft.in_situ_image_url ? (
-                    <>
-                      <Image src={draft.in_situ_image_url} alt="" fill sizes="520px" className="object-cover" unoptimized />
-                      <span className="absolute inset-0 flex items-center justify-center bg-ink/55 font-mono text-[9px] uppercase tracking-[0.2em] text-white opacity-0 transition-opacity group-hover:opacity-100">
-                        Replace
-                      </span>
-                    </>
-                  ) : uploading ? (
-                    <LoaderCircle size={20} className="animate-spin text-gold" />
-                  ) : (
-                    <span className="flex flex-col items-center gap-2 text-muted">
-                      <ImagePlus size={20} />
-                      <span className="font-mono text-[9px] uppercase tracking-[0.18em]">Upload in-room shot</span>
-                    </span>
-                  )}
-                </button>
-                {draft.in_situ_image_url && (
-                  <button
-                    type="button"
-                    onClick={() => set("in_situ_image_url", "")}
-                    className="mt-2 font-mono text-[9px] uppercase tracking-[0.16em] text-muted transition-colors hover:text-red-500"
-                  >
-                    Remove in-room shot
-                  </button>
-                )}
-                <input
-                  ref={situRef}
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={(e) => void pickSitu(e.target.files?.[0])}
                 />
               </div>
 

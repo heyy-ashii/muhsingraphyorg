@@ -29,6 +29,7 @@ import { ARTWORK_STATUSES, INQUIRY_STATUSES, galleryOf } from "@/lib/types";
 import type { ArtworkStatus } from "@/lib/types";
 import { cn, formatDate, pad } from "@/lib/utils";
 import { BrandLockup } from "@/components/ui/brand-lockup";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
   ADMIN_NOT_CONFIGURED,
@@ -265,7 +266,13 @@ export function DashboardClient({
           </nav>
 
           <div className="mt-auto hidden border-t border-line pt-5 lg:block">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
+                Appearance
+              </span>
+              <ThemeToggle />
+            </div>
+            <div className="mt-5 flex items-center gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold/15 font-display text-base text-gold-deep dark:text-gold">
                 {displayName.slice(0, 1).toUpperCase()}
               </span>
@@ -327,6 +334,9 @@ export function DashboardClient({
               >
                 <LogOut size={15} />
               </button>
+              <span className="lg:hidden">
+                <ThemeToggle />
+              </span>
               {tab === "artworks" && (
                 <button
                   type="button"
