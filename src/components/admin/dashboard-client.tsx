@@ -39,10 +39,12 @@ import {
 } from "@/lib/admin";
 import type { SiteContent } from "@/lib/content/schema";
 import { DEFAULT_CONTENT } from "@/lib/content/defaults";
+import { displayNameOf } from "@/lib/account";
 import { ContentEditor } from "./content-editor";
+import { AccountPanel } from "./account-panel";
 import { ArtworkFormDrawer } from "./artwork-form-drawer";
 
-type Tab = "artworks" | "inquiries" | "content";
+type Tab = "artworks" | "inquiries" | "content" | "account";
 
 const INQUIRY_TONE: Record<InquiryStatus, string> = {
   New: "border-gold/50 bg-gold/10 text-gold-deep dark:text-gold",
@@ -50,11 +52,18 @@ const INQUIRY_TONE: Record<InquiryStatus, string> = {
   Archived: "border-line bg-canvas-2 text-muted",
 };
 
-export function DashboardClient({ email }: { email: string }) {
+export function DashboardClient({
+  email,
+  userMetadata,
+}: {
+  email: string;
+  userMetadata?: Record<string, unknown> | null;
+}) {
   const router = useRouter();
   const configured = adminConfigured();
 
   const [tab, setTab] = useState<Tab>("artworks");
+  const [displayName, setDisplayName] = useState(() => displayNameOf(email, userMetadata));
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -194,7 +203,7 @@ export function DashboardClient({ email }: { email: string }) {
               <ArrowUpRight size={12} />
             </Link>
             <span className="hidden max-w-[190px] truncate font-mono text-[9px] uppercase tracking-[0.16em] text-muted lg:block">
-              {email}
+              {displayName}
             </span>
             <button
               type="button"
@@ -259,12 +268,13 @@ export function DashboardClient({ email }: { email: string }) {
         </div>
 
         {/* ── tabs ──────────────────────────────────────────── */}
-        <div className="mt-10 flex items-center gap-1 border-b border-line">
+        <div className="mt-10 flex flex-wrap items-center gap-1 border-b border-line">
           {(
             [
               ["artworks", `Artworks (${artworks.length})`],
               ["inquiries", `Commission Inquiries (${inquiries.length})`],
               ["content", "Site Content"],
+              ["account", "Account"],
             ] as const
           ).map(([key, label]) => (
             <button
@@ -358,6 +368,10 @@ export function DashboardClient({ email }: { email: string }) {
           <div className="mt-8">
             <ContentEditor initial={content} tableMissing={contentMissing} />
           </div>
+        )}
+
+        {tab === "account" && (
+          <AccountPanel email={email} onProfileSaved={(name) => name && setDisplayName(name)} />
         )}
       </main>
 
