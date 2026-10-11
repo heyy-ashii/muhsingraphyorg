@@ -17,6 +17,7 @@ create table if not exists public.artworks (
   status              text        not null default 'Available'
                       check (status in ('Available', 'Private Collection', 'Reserved')),
   image_url           text        not null,
+  images              text[]      not null default '{}',
   in_situ_image_url   text,
   is_featured         boolean     not null default false,
   is_published        boolean     not null default true,
@@ -25,6 +26,10 @@ create table if not exists public.artworks (
   description         text,
   created_at          timestamptz not null default now()
 );
+
+-- Idempotent migration for archives created before the multi-image gallery.
+alter table public.artworks
+  add column if not exists images text[] not null default '{}';
 
 create index if not exists artworks_display_order_idx
   on public.artworks (display_order asc, created_at desc);

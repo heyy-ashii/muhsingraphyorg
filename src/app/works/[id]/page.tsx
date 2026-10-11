@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import type { Artwork } from "@/lib/types";
+import { galleryOf } from "@/lib/types";
 import { getArtworkById, getArtworks } from "@/lib/artworks";
 import { SITE } from "@/lib/site";
 import { getSiteContent } from "@/lib/content/load";
@@ -43,7 +44,7 @@ export async function generateMetadata({
       title: `${artwork.title} · Muhsingraphy`,
       description: `${artwork.script_style} · ${artwork.medium} · ${artwork.dimensions}`,
       url,
-      images: [{ url: artwork.image_url, alt: artwork.title }],
+      images: galleryOf(artwork).map((src) => ({ url: src, alt: artwork.title })),
     },
   };
 }
@@ -64,7 +65,7 @@ export default async function ArtworkPage({ params }: { params: Promise<{ id: st
     artform: artwork.script_style,
     artMedium: artwork.medium,
     dateCreated: artwork.year,
-    image: artwork.image_url,
+    image: galleryOf(artwork),
     description: artwork.description ?? undefined,
     ...(artwork.status === "Available"
       ? { offers: { "@type": "Offer", availability: "https://schema.org/InStock", url: `${SITE.url}/works/${artwork.id}` } }

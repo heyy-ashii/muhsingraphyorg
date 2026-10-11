@@ -43,12 +43,28 @@ export interface Artwork {
   year: string;
   status: ArtworkStatus;
   image_url: string;
+  /**
+   * Additional photographs of the same piece — different portions, angles or
+   * detail studies. `image_url` stays the canonical hero/cover; this holds the
+   * rest of the gallery. Always includes `image_url` first when read through
+   * `galleryOf`, so callers never have to special-case the cover.
+   */
+  images?: string[] | null;
   in_situ_image_url?: string | null;
   is_featured: boolean;
   display_order: number;
   categories: string[];
   description?: string | null;
   created_at: string;
+}
+
+/**
+ * Ordered, de-duplicated list of a piece's photographs for the public gallery.
+ * The cover (`image_url`) always leads; legacy rows without `images` still work.
+ */
+export function galleryOf(artwork: Pick<Artwork, "image_url" | "images">): string[] {
+  const list = [artwork.image_url, ...(artwork.images ?? [])].filter(Boolean);
+  return [...new Set(list)];
 }
 
 export interface Inquiry {

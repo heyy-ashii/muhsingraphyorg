@@ -9,6 +9,7 @@ import {
   ArrowUpRight,
   Check,
   GripVertical,
+  Images,
   LoaderCircle,
   LogOut,
   Mail,
@@ -19,7 +20,8 @@ import {
   Trash,
 } from "lucide-react";
 import type { Artwork, ArtworkInput, Inquiry, InquiryStatus } from "@/lib/types";
-import { ARTWORK_STATUSES, INQUIRY_STATUSES } from "@/lib/types";
+import { ARTWORK_STATUSES, INQUIRY_STATUSES, galleryOf } from "@/lib/types";
+import type { ArtworkStatus } from "@/lib/types";
 import { cn, formatDate, pad } from "@/lib/utils";
 import { SITE } from "@/lib/site";
 import { BrandLockup } from "@/components/ui/brand-lockup";
@@ -149,14 +151,13 @@ export function DashboardClient({
     }
   }
 
-  async function cycleStatus(artwork: Artwork) {
-    const idx = ARTWORK_STATUSES.indexOf(artwork.status);
-    const next = ARTWORK_STATUSES[(idx + 1) % ARTWORK_STATUSES.length];
-    setArtworks((prev) => prev.map((a) => (a.id === artwork.id ? { ...a, status: next } : a)));
+  async function setStatus(artwork: Artwork, status: ArtworkStatus) {
+    const previous = artwork.status;
+    setArtworks((prev) => prev.map((a) => (a.id === artwork.id ? { ...a, status } : a)));
     try {
-      await updateArtwork(artwork.id, { status: next });
+      await updateArtwork(artwork.id, { status });
     } catch (err) {
-      setArtworks((prev) => prev.map((a) => (a.id === artwork.id ? artwork : a)));
+      setArtworks((prev) => prev.map((a) => (a.id === artwork.id ? { ...a, status: previous } : a)));
       setError(err instanceof Error ? err.message : "Status update failed.");
     }
   }
@@ -251,18 +252,16 @@ export function DashboardClient({
         </div>
 
         {/* ── stats ─────────────────────────────────────────── */}
-        <div className="mt-10 grid grid-cols-2 gap-px overflow-hidden border border-line bg-line lg:grid-cols-4">
+        <div className="mt-8 flex flex-wrap items-center gap-x-9 gap-y-3 border-y border-line py-4">
           {[
-            ["Works in archive", stats.total],
-            ["Available now", stats.available],
+            ["Works", stats.total],
+            ["Available", stats.available],
             ["New enquiries", stats.newInquiries],
             ["Studio", SITE.studio.city],
           ].map(([label, value]) => (
-            <div key={String(label)} className="bg-surface px-6 py-6">
-              <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted">{label}</p>
-              <p className="mt-3 font-display text-[clamp(1.8rem,3vw,2.4rem)] leading-none text-ink">
-                {value}
-              </p>
+            <div key={String(label)} className="flex items-baseline gap-2.5">
+              <span className="font-display text-[26px] leading-none text-ink">{value}</span>
+              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted">{label}</span>
             </div>
           ))}
         </div>
@@ -272,7 +271,7 @@ export function DashboardClient({
           {(
             [
               ["artworks", `Artworks (${artworks.length})`],
-              ["inquiries", `Commission Inquiries (${inquiries.length})`],
+              ["inquiries", `Enquiries (${inquiries.length})`],
               ["content", "Site Content"],
               ["account", "Account"],
             ] as const
@@ -338,10 +337,10 @@ export function DashboardClient({
               setDrawerOpen(true);
             }}
             onDelete={handleDelete}
-            onCycleStatus={cycleStatus}
+            onSetStatus={setStatus}
             onToggleFeatured={toggleFeatured}
           />
-        ) : (
+        ) : tab === "inquiries" ? (
           <InquiriesPanel
             inquiries={inquiries}
             onStatus={async (id, status) => {
@@ -362,7 +361,7 @@ export function DashboardClient({
               }
             }}
           />
-        )}
+        ) : null}
 
         {tab === "content" && (
           <div className="mt-8">
@@ -393,14 +392,14 @@ function ArtworksPanel({
   onReorder,
   onEdit,
   onDelete,
-  onCycleStatus,
+  onSetStatus,
   onToggleFeatured,
 }: {
   artworks: Artwork[];
   onReorder: (next: Artwork[]) => void;
   onEdit: (a: Artwork) => void;
   onDelete: (a: Artwork) => void;
-  onCycleStatus: (a: Artwork) => void;
+  onSetStatus: (a: Artwork, status: ArtworkStatus) => void;
   onToggleFeatured: (a: Artwork) => void;
 }) {
   if (!artworks.length) {
@@ -427,7 +426,7 @@ function ArtworksPanel({
           <Reorder.Item
             key={artwork.id}
             value={artwork}
-            className="group grid grid-cols-[auto_64px_1fr_auto] items-center gap-4 border border-line bg-surface px-4 py-3.5 sm:grid-cols-[auto_72px_1.6fr_1fr_auto] sm:gap-6"
+            className="group grid grid-cols-[auto_56px_1fr_auto] items-center gap-4 border border-line bg-surface px-4 py-3.5 sm:grid-cols-[auto_64px_1.6fr_1fr_auto] sm:gap-6"
           >
             <button
               type="button"
@@ -447,26 +446,37 @@ function ArtworksPanel({
                 <h3 className="truncate font-display text-xl text-ink">{artwork.title}</h3>
                 {artwork.is_featured && <Sparkles size={12} className="shrink-0 text-gold" />}
               </div>
-              <p className="mt-1 truncate font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
-                {artwork.script_style} · {artwork.dimensions} · {artwork.year}
-              </p>
+              <div className="mt-1 flex items-center gap-3">
+                <p className="truncate font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
+                  {artwork.script_style} · {artwork.dimensions} · {artwork.year}
+                </p>
+                {galleryOf(artwork).length > 1 && (
+                  <span className="inline-flex shrink-0 items-center gap-1 font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
+                    <Images size={11} /> {galleryOf(artwork).length}
+                  </span>
+                )}
+              </div>
             </div>
 
-            <div className="hidden sm:block">
-              <button
-                type="button"
-                onClick={() => onCycleStatus(artwork)}
-                title="Click to cycle status"
+            <label className="hidden sm:block">
+              <span className="sr-only">Status for {artwork.title}</span>
+              <select
+                value={artwork.status}
+                onChange={(e) => onSetStatus(artwork, e.target.value as ArtworkStatus)}
                 className={cn(
-                  "rounded-full border px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors duration-400",
+                  "h-9 rounded-full border bg-transparent px-3 font-mono text-[9px] uppercase tracking-[0.16em] outline-none transition-colors duration-400",
                   artwork.status === "Available"
-                    ? "border-gold/50 bg-gold/10 text-gold-deep dark:text-gold"
-                    : "border-line bg-canvas-2 text-muted",
+                    ? "border-gold/50 text-gold-deep dark:text-gold"
+                    : "border-line text-muted hover:border-gold/35 hover:text-ink",
                 )}
               >
-                {artwork.status}
-              </button>
-            </div>
+                {ARTWORK_STATUSES.map((s) => (
+                  <option key={s} value={s} className="bg-surface text-ink">
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </label>
 
             <div className="flex items-center gap-1.5">
               <button
