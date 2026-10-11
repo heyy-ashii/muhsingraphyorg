@@ -45,12 +45,14 @@ export function Text({
 
 export function Area({
   label,
+  hint,
   value,
   onChange,
   rows = 4,
   placeholder,
 }: {
   label: string;
+  hint?: string;
   value: string;
   onChange: (v: string) => void;
   rows?: number;
@@ -59,6 +61,7 @@ export function Area({
   return (
     <label className="block">
       <Label>{label}</Label>
+      {hint && <span className="mt-1 block text-[12px] leading-snug text-muted">{hint}</span>}
       <textarea
         value={value}
         rows={rows}
@@ -87,7 +90,7 @@ export function Toggle({
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className="flex w-full items-center justify-between gap-4 border border-line bg-surface px-4 py-3.5 text-left transition-colors hover:border-gold/40"
+      className="flex w-full items-center justify-between gap-4 rounded-xl border border-line bg-surface px-4 py-3.5 text-left transition-colors hover:border-gold/40"
     >
       <span>
         <span className="block font-mono text-[10px] uppercase tracking-[0.18em] text-ink">{label}</span>
@@ -146,7 +149,7 @@ export function ImageField({
     <div>
       <Label>{label}</Label>
       <div className="mt-2 flex gap-4">
-        <div className={cn("relative w-40 shrink-0 overflow-hidden border border-line bg-canvas-2", aspect)}>
+        <div className={cn("relative w-40 shrink-0 overflow-hidden rounded-xl border border-line bg-canvas-2", aspect)}>
           {value ? (
             <Image src={value} alt="" fill sizes="160px" className="object-cover" unoptimized />
           ) : (
@@ -253,8 +256,46 @@ export function StringList({
   );
 }
 
-/* ── collapsible panel ───────────────────────────────────────── */
+/* ── collapsible group card ──────────────────────────────────── */
 
+/**
+ * The core building block of the dashboard's card language: a rounded surface
+ * with an optional leading icon, a title, a one-line description and free-form
+ * children. `Card` is always open; `Panel` is the collapsible variant used by
+ * the Site Content editor.
+ */
+export function Card({
+  icon,
+  title,
+  description,
+  children,
+  className,
+}: {
+  icon?: React.ReactNode;
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={cn("rounded-2xl border border-line bg-surface", className)}>
+      <header className="flex items-start gap-3 border-b border-line px-5 py-4 sm:px-6">
+        {icon && (
+          <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gold/10 text-gold-deep dark:text-gold">
+            {icon}
+          </span>
+        )}
+        <span className="min-w-0">
+          <h3 className="font-display text-[19px] leading-tight text-ink">{title}</h3>
+          {description && <p className="mt-1 text-[12.5px] leading-relaxed text-muted">{description}</p>}
+        </span>
+      </header>
+      <div className="space-y-6 px-5 py-6 sm:px-6">{children}</div>
+    </section>
+  );
+}
+
+/** Collapsible variant of `Card`, used for the densely nested Site Content groups. */
 export function Panel({
   title,
   index,
@@ -270,18 +311,18 @@ export function Panel({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <section className="border border-line bg-surface">
+    <section className="overflow-hidden rounded-2xl border border-line bg-surface">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left sm:px-7"
+        className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition-colors hover:bg-canvas-2/40 sm:px-6"
       >
         <span className="flex items-baseline gap-4">
           {index && <span className="font-mono text-[10px] tracking-[0.24em] text-gold">{index}</span>}
-          <span>
-            <span className="block font-display text-[22px] leading-tight text-ink">{title}</span>
-            {description && <span className="mt-1 block text-[12.5px] text-muted">{description}</span>}
+          <span className="min-w-0">
+            <span className="block font-display text-[20px] leading-tight text-ink">{title}</span>
+            {description && <span className="mt-1 block text-[12.5px] leading-relaxed text-muted">{description}</span>}
           </span>
         </span>
         <span
@@ -293,7 +334,7 @@ export function Panel({
           ▾
         </span>
       </button>
-      {open && <div className="space-y-6 border-t border-line px-5 py-6 sm:px-7">{children}</div>}
+      {open && <div className="space-y-6 border-t border-line px-5 py-6 sm:px-6">{children}</div>}
     </section>
   );
 }
@@ -332,7 +373,7 @@ export function Segmented<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div className="border border-line bg-surface px-4 py-3.5">
+    <div className="rounded-xl border border-line bg-surface px-4 py-3.5">
       <Label>{label}</Label>
       {hint && <p className="mt-1 text-[12px] leading-snug text-muted">{hint}</p>}
       <div className="mt-3 flex flex-wrap gap-2">
@@ -345,7 +386,7 @@ export function Segmented<T extends string>({
               aria-pressed={active}
               onClick={() => onChange(o.value)}
               className={cn(
-                "border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors duration-300",
+                "rounded-full border px-3.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors duration-300",
                 active
                   ? "border-gold/60 bg-gold/15 text-ink"
                   : "border-line text-muted hover:border-gold/40 hover:text-ink",
@@ -424,7 +465,7 @@ export function MediaGallery({
 
       <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
         {list.map((src, i) => (
-          <div key={`${src}-${i}`} className="group relative aspect-square overflow-hidden border border-line bg-canvas-2">
+          <div key={`${src}-${i}`} className="group relative aspect-square overflow-hidden rounded-xl border border-line bg-canvas-2">
             <Image src={src} alt="" fill sizes="140px" className="object-cover" unoptimized />
             {i === 0 && (
               <span className="absolute left-1.5 top-1.5 rounded-full bg-gold/90 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.16em] text-ink">
