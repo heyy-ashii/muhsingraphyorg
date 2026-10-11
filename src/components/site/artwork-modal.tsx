@@ -9,14 +9,11 @@ import { galleryOf } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AcquireButton } from "@/components/ui/whatsapp-button";
-import { RoomPreview } from "./room-preview";
 import { buildArtworkMessage, whatsappLink } from "@/lib/whatsapp";
 import { useSiteContent } from "@/lib/content/context";
 
 const LENS = 208;
 const ZOOM = 2.6;
-
-type ViewMode = "artwork" | "room";
 
 export function ArtworkModal({
   artwork,
@@ -25,7 +22,6 @@ export function ArtworkModal({
   artwork: Artwork | null;
   onClose: () => void;
 }) {
-  const [view, setView] = useState<ViewMode>("artwork");
   const [index, setIndex] = useState(0);
   const [lensOn, setLensOn] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0, bx: 50, by: 50 });
@@ -38,7 +34,6 @@ export function ArtworkModal({
 
   useEffect(() => {
     if (!artwork) return;
-    setView("artwork");
     setIndex(0);
     setLensOn(false);
   }, [artwork]);
@@ -108,33 +103,11 @@ export function ArtworkModal({
           >
             {/* ── Stage ─────────────────────────────────────────── */}
             <div className="relative flex flex-1 flex-col bg-[#0b0b0d] lg:min-w-0">
-              <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-3.5">
-                <div className="inline-flex rounded-full border border-white/15 p-0.5">
-                  {(["artwork", "room"] as ViewMode[]).map((mode) => (
-                    <button
-                      key={mode}
-                      type="button"
-                      onClick={() => {
-                        setView(mode);
-                        setLensOn(false);
-                      }}
-                      className={cn(
-                        "rounded-full px-3.5 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] transition-colors duration-500",
-                        view === mode ? "bg-white text-[#0b0b0d]" : "text-white/60 hover:text-white",
-                      )}
-                    >
-                      {mode === "artwork" ? "Artwork View" : "View in Room"}
-                    </button>
-                  ))}
-                </div>
+              <div className="flex items-center justify-end gap-4 border-b border-white/10 px-5 py-3.5">
                 <button
                   type="button"
                   onClick={() => setLensOn((v) => !v)}
-                  disabled={view === "room"}
-                  className={cn(
-                    "inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-white/70 transition-colors duration-500 hover:border-gold/60 hover:text-gold",
-                    view === "room" && "cursor-not-allowed opacity-35 hover:border-white/15 hover:text-white/70",
-                  )}
+                  className="hidden items-center gap-2 rounded-full border border-white/15 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-white/70 transition-colors duration-500 hover:border-gold/60 hover:text-gold md:inline-flex"
                 >
                   {lensOn ? <Minimize2 size={11} /> : <Maximize2 size={11} />}
                   {lensOn ? "Lens on" : "Zoom lens"}
@@ -144,58 +117,35 @@ export function ArtworkModal({
               <div
                 ref={stageRef}
                 onMouseMove={onStageMove}
-                onMouseEnter={() => view === "artwork" && setLensOn(true)}
+                onMouseEnter={() => setLensOn(true)}
                 onMouseLeave={() => setLensOn(false)}
                 className={cn(
                   "relative flex flex-1 items-center justify-center overflow-hidden p-6 sm:p-10",
-                  view === "artwork" && lensOn && "cursor-none",
+                  lensOn && "md:cursor-none",
                 )}
               >
                 <AnimatePresence mode="wait">
-                  {view === "artwork" ? (
-                    <motion.div
-                      key={current}
-                      initial={{ opacity: 0, scale: 1.03 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                      className="relative h-full max-h-[74vh] w-full"
-                    >
-                      <Image
-                        src={current}
-                        alt={`${artwork.title} — ${artwork.script_style} calligraphy by Muhsin (view ${index + 1})`}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 62vw"
-                        priority
-                        className="object-contain"
-                      />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="room"
-                      initial={{ opacity: 0, scale: 1.03 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                      className="relative h-full max-h-[74vh] w-full overflow-hidden rounded-sm"
-                    >
-                      {artwork.in_situ_image_url ? (
-                        <Image
-                          src={artwork.in_situ_image_url}
-                          alt={`${artwork.title} installed in a collector's interior`}
-                          fill
-                          sizes="(max-width: 1024px) 100vw, 62vw"
-                          className="object-cover"
-                        />
-                      ) : (
-                        <RoomPreview src={artwork.image_url} alt={artwork.title} />
-                      )}
-                    </motion.div>
-                  )}
+                  <motion.div
+                    key={current}
+                    initial={{ opacity: 0, scale: 1.03 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                    className="relative h-full max-h-[74vh] w-full"
+                  >
+                    <Image
+                      src={current}
+                      alt={`${artwork.title} — ${artwork.script_style} calligraphy by Muhsin (view ${index + 1})`}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 62vw"
+                      priority
+                      className="object-contain"
+                    />
+                  </motion.div>
                 </AnimatePresence>
 
                 {/* gallery navigation */}
-                {many && view === "artwork" && (
+                {many && (
                   <>
                     <button
                       type="button"
@@ -221,7 +171,7 @@ export function ArtworkModal({
 
                 {/* magnifier */}
                 <AnimatePresence>
-                  {lensOn && view === "artwork" && (
+                  {lensOn && (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.7 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -247,13 +197,13 @@ export function ArtworkModal({
                   )}
                 </AnimatePresence>
 
-                <span className="pointer-events-none absolute bottom-4 right-5 font-mono text-[9px] uppercase tracking-[0.24em] text-white/35">
-                  {view === "artwork" ? "Hover to inspect stroke & gilding" : "Conceptual interior preview"}
+                <span className="pointer-events-none absolute bottom-4 right-5 hidden font-mono text-[9px] uppercase tracking-[0.24em] text-white/35 md:block">
+                  Hover to inspect stroke &amp; gilding
                 </span>
               </div>
 
               {/* thumbnail strip */}
-              {many && view === "artwork" && (
+              {many && (
                 <div className="flex shrink-0 gap-3 overflow-x-auto border-t border-white/10 px-5 py-4 no-scrollbar sm:px-10">
                   {images.map((src, i) => (
                     <button
