@@ -6,8 +6,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, Reorder, motion } from "framer-motion";
 import {
+  ArrowUpRight,
   Check,
   ChevronRight,
+  CircleCheck,
   CircleUser,
   ExternalLink,
   FileText,
@@ -23,6 +25,7 @@ import {
   RefreshCw,
   Sparkles,
   Trash,
+  type LucideIcon,
 } from "lucide-react";
 import type { Artwork, ArtworkInput, Inquiry, InquiryStatus } from "@/lib/types";
 import { ARTWORK_STATUSES, INQUIRY_STATUSES, galleryOf } from "@/lib/types";
@@ -227,7 +230,7 @@ export function DashboardClient({
             <BrandLockup size="sm" />
           </Link>
 
-          <nav className="flex flex-row gap-1 overflow-x-auto lg:flex-col lg:overflow-visible">
+          <nav className="no-scrollbar -mx-1 flex flex-row gap-1 overflow-x-auto px-1 pb-1 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0">
             {NAV.map(({ key, label, icon: Icon }) => {
               const active = tab === key;
               const count =
@@ -242,7 +245,7 @@ export function DashboardClient({
                   type="button"
                   onClick={() => setTab(key)}
                   className={cn(
-                    "group inline-flex shrink-0 items-center gap-3 rounded-xl px-3.5 py-2.5 text-[13px] font-medium transition-colors duration-300 lg:w-full",
+                    "group inline-flex shrink-0 items-center gap-3 rounded-xl px-3.5 py-3 text-[13px] font-medium transition-colors duration-300 lg:w-full lg:py-2.5",
                     active
                       ? "bg-surface text-ink shadow-whisper"
                       : "text-muted hover:bg-surface/60 hover:text-ink",
@@ -332,7 +335,7 @@ export function DashboardClient({
                 onClick={() => void refresh()}
                 aria-label="Refresh"
                 title="Refresh"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-gold/50 hover:text-gold"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-gold/50 hover:text-gold"
               >
                 <RefreshCw size={15} className={cn(loading && "animate-spin")} />
               </button>
@@ -341,7 +344,7 @@ export function DashboardClient({
                 onClick={signOut}
                 aria-label="Sign out"
                 title="Sign out"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-red-500/50 hover:text-red-500 lg:hidden"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-red-500/50 hover:text-red-500 lg:hidden"
               >
                 <LogOut size={15} />
               </button>
@@ -352,7 +355,7 @@ export function DashboardClient({
                 <button
                   type="button"
                   onClick={openNew}
-                  className="btn-ink h-10 rounded-full px-5 text-[12px] font-medium"
+                  className="btn-ink h-11 rounded-full px-5 text-[12px] font-medium"
                 >
                   <Plus size={14} />
                   <span>Add artwork</span>
@@ -468,16 +471,17 @@ function OverviewPanel({
   onEdit: (a: Artwork) => void;
   onGoTo: (tab: Tab) => void;
 }) {
-  const cards: { label: string; value: string | number; hint: string; tab?: Tab }[] = [
-    { label: "Works in archive", value: stats.total, hint: "Total pieces", tab: "artworks" },
-    { label: "Available", value: stats.available, hint: "Open to acquisition" },
-    { label: "Featured", value: stats.featured, hint: "In hero & pavilion" },
-    {
-      label: "New enquiries",
-      value: stats.newInquiries,
-      hint: "Awaiting reply",
-      tab: "inquiries",
-    },
+  const cards: {
+    label: string;
+    value: number;
+    hint: string;
+    icon: LucideIcon;
+    tab?: Tab;
+  }[] = [
+    { label: "Works in archive", value: stats.total, hint: "Total pieces", icon: LayoutGrid, tab: "artworks" },
+    { label: "Available", value: stats.available, hint: "Open to acquisition", icon: CircleCheck },
+    { label: "Featured", value: stats.featured, hint: "In hero & pavilion", icon: Sparkles },
+    { label: "New enquiries", value: stats.newInquiries, hint: "Awaiting reply", icon: Inbox, tab: "inquiries" },
   ];
 
   const recentWorks = [...artworks].sort((a, b) => a.display_order - b.display_order).slice(0, 4);
@@ -485,33 +489,51 @@ function OverviewPanel({
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {cards.map((c) => (
-          <button
-            key={c.label}
-            type="button"
-            onClick={() => c.tab && onGoTo(c.tab)}
-            disabled={!c.tab}
-            className={cn(
-              "rounded-2xl border border-line bg-surface p-5 text-left transition-colors",
-              c.tab && "hover:border-gold/40",
-            )}
-          >
-            <p className="font-display text-[38px] leading-none text-ink">{c.value}</p>
-            <p className="mt-3 text-[13px] font-medium text-ink">{c.label}</p>
-            <p className="mt-0.5 text-[11.5px] text-muted">{c.hint}</p>
-          </button>
-        ))}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        {cards.map((c) => {
+          const Icon = c.icon;
+          return (
+            <button
+              key={c.label}
+              type="button"
+              onClick={() => c.tab && onGoTo(c.tab)}
+              disabled={!c.tab}
+              className={cn(
+                "group flex flex-col rounded-2xl border border-line bg-surface p-4 text-left transition-colors sm:p-5",
+                c.tab && "hover:border-gold/40",
+              )}
+            >
+              <span className="flex items-start justify-between gap-2">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gold/10 text-gold-deep dark:text-gold">
+                  <Icon size={16} />
+                </span>
+                {c.tab && (
+                  <ArrowUpRight
+                    size={15}
+                    className="text-muted/40 transition-colors group-hover:text-gold"
+                  />
+                )}
+              </span>
+              <span className="mt-4 font-display text-[clamp(2rem,8vw,2.5rem)] leading-none text-ink">
+                {c.value}
+              </span>
+              <span className="mt-2.5 text-[13px] font-medium text-ink">{c.label}</span>
+              <span className="mt-0.5 text-[11.5px] text-muted">{c.hint}</span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.35fr_1fr]">
         <section className="rounded-2xl border border-line bg-surface">
           <div className="flex items-center justify-between gap-4 border-b border-line px-5 py-4">
-            <h2 className="text-[13.5px] font-semibold text-ink">Recent works</h2>
+            <h2 className="flex items-center gap-2 text-[13.5px] font-semibold text-ink">
+              <Images size={15} className="text-gold-deep dark:text-gold" /> Recent works
+            </h2>
             <button
               type="button"
               onClick={() => onGoTo("artworks")}
-              className="inline-flex items-center gap-1 text-[12px] text-muted transition-colors hover:text-gold"
+              className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-[12px] text-muted transition-colors hover:text-gold"
             >
               View all <ChevronRight size={13} />
             </button>
@@ -523,7 +545,7 @@ function OverviewPanel({
                   <button
                     type="button"
                     onClick={() => onEdit(a)}
-                    className="flex w-full items-center gap-4 px-5 py-3.5 text-left transition-colors hover:bg-canvas-2/50"
+                    className="group flex w-full items-center gap-4 px-5 py-3.5 text-left transition-colors hover:bg-canvas-2/50"
                   >
                     <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-canvas-2">
                       <Image src={a.image_url} alt="" fill sizes="48px" className="object-cover" />
@@ -536,7 +558,13 @@ function OverviewPanel({
                         {a.script_style} · {a.year}
                       </span>
                     </span>
-                    <span className={cn(pill, "shrink-0", STATUS_TONE[a.status])}>{a.status}</span>
+                    <span className={cn(pill, "hidden shrink-0 sm:inline-flex", STATUS_TONE[a.status])}>
+                      {a.status}
+                    </span>
+                    <Pencil
+                      size={14}
+                      className="shrink-0 text-muted/40 transition-colors group-hover:text-gold"
+                    />
                   </button>
                 </li>
               ))}
@@ -557,11 +585,13 @@ function OverviewPanel({
 
         <section className="rounded-2xl border border-line bg-surface">
           <div className="flex items-center justify-between gap-4 border-b border-line px-5 py-4">
-            <h2 className="text-[13.5px] font-semibold text-ink">Latest enquiries</h2>
+            <h2 className="flex items-center gap-2 text-[13.5px] font-semibold text-ink">
+              <Inbox size={15} className="text-gold-deep dark:text-gold" /> Latest enquiries
+            </h2>
             <button
               type="button"
               onClick={() => onGoTo("inquiries")}
-              className="inline-flex items-center gap-1 text-[12px] text-muted transition-colors hover:text-gold"
+              className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-[12px] text-muted transition-colors hover:text-gold"
             >
               View all <ChevronRight size={13} />
             </button>
@@ -670,16 +700,20 @@ function ArtworksPanel({
                     <Images size={11} /> {galleryOf(artwork).length} images
                   </span>
                 )}
+                {/* Mobile keeps the status reachable as a chip; the select below is hidden there. */}
+                <span className={cn(pill, "sm:hidden", STATUS_TONE[artwork.status])}>
+                  {artwork.status}
+                </span>
               </div>
             </div>
 
-            <label className="hidden md:block">
+            <label className="hidden sm:block">
               <span className="sr-only">Status for {artwork.title}</span>
               <select
                 value={artwork.status}
                 onChange={(e) => onSetStatus(artwork, e.target.value as ArtworkStatus)}
                 className={cn(
-                  "h-8 cursor-pointer rounded-full border bg-transparent px-3 text-[11.5px] font-medium outline-none transition-colors",
+                  "h-9 cursor-pointer rounded-full border bg-transparent px-3 text-[11.5px] font-medium outline-none transition-colors",
                   STATUS_TONE[artwork.status],
                 )}
               >
@@ -691,14 +725,14 @@ function ArtworksPanel({
               </select>
             </label>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5 sm:gap-1">
               <button
                 type="button"
                 onClick={() => onToggleFeatured(artwork)}
                 aria-label="Toggle featured"
                 title="Feature in hero & pavilion"
                 className={cn(
-                  "inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors",
+                  "inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors",
                   artwork.is_featured
                     ? "text-gold hover:bg-gold/10"
                     : "text-muted/70 hover:bg-canvas-2 hover:text-gold",
@@ -711,7 +745,7 @@ function ArtworksPanel({
                 onClick={() => onEdit(artwork)}
                 aria-label="Edit artwork"
                 title="Edit"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-canvas-2 hover:text-ink"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full text-muted transition-colors hover:bg-canvas-2 hover:text-ink"
               >
                 <Pencil size={15} />
               </button>
@@ -720,7 +754,7 @@ function ArtworksPanel({
                 onClick={() => onDelete(artwork)}
                 aria-label="Delete artwork"
                 title="Delete"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted/70 transition-colors hover:bg-red-500/10 hover:text-red-500"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full text-muted/70 transition-colors hover:bg-red-500/10 hover:text-red-500"
               >
                 <Trash size={15} />
               </button>
@@ -776,14 +810,14 @@ function InquiriesPanel({
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               {INQUIRY_STATUSES.map((s) => (
                 <button
                   key={s}
                   type="button"
                   onClick={() => onStatus(inq.id, s)}
                   className={cn(
-                    "rounded-full border px-3 py-1 text-[11.5px] font-medium transition-colors",
+                    "rounded-full border px-3.5 py-2 text-[11.5px] font-medium transition-colors",
                     inq.status === s
                       ? "border-gold/50 bg-gold/10 text-gold-deep dark:text-gold"
                       : "border-line text-muted hover:border-gold/35 hover:text-ink",
@@ -796,7 +830,7 @@ function InquiriesPanel({
                 type="button"
                 onClick={() => onDelete(inq.id)}
                 aria-label="Delete enquiry"
-                className="ml-1 inline-flex h-8 w-8 items-center justify-center rounded-full text-muted/70 transition-colors hover:bg-red-500/10 hover:text-red-500"
+                className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-full text-muted/70 transition-colors hover:bg-red-500/10 hover:text-red-500"
               >
                 <Trash size={14} />
               </button>
