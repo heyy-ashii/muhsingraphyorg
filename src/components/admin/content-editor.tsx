@@ -50,7 +50,7 @@ const GROUPS: { key: GroupKey; label: string; icon: LucideIcon; hint: string }[]
   { key: "brand", label: "Brand & identity", icon: Palette, hint: "Wordmark, logo emblem, tagline and favicon." },
   { key: "home", label: "Home & hero", icon: ImageIcon, hint: "Exhibition opening headline, image and stats." },
   { key: "sections", label: "Page sections", icon: LayoutGrid, hint: "Headings, descriptions and content for each section." },
-  { key: "contact", label: "Contact & credit", icon: Link2, hint: "WhatsApp, email, Instagram, studio and site credit." },
+  { key: "contact", label: "Contact", icon: Link2, hint: "WhatsApp, email, Instagram and studio details." },
   { key: "ticker", label: "Moving banner", icon: MessageSquare, hint: "Marquee words, speed, separator and visibility." },
 ];
 
@@ -308,16 +308,6 @@ function ContactGroup({ draft, apply }: { draft: SiteContent; apply: Apply }) {
           <Text label="Studio line 2" value={draft.contact.studioLine2} onChange={(v) => apply(edit(draft, (d) => void (d.contact.studioLine2 = v)))} />
           <Text label="City" value={draft.contact.city} onChange={(v) => apply(edit(draft, (d) => void (d.contact.city = v)))} />
           <Text label="Country" value={draft.contact.country} onChange={(v) => apply(edit(draft, (d) => void (d.contact.country = v)))} />
-        </Grid>
-      </Card>
-
-      <Card icon={<Link2 size={16} />} title="Site credit" description="Attribution line for the site's builder, shown in the footer.">
-        <Grid>
-          <Text label="Credit label" value={draft.credit.label} onChange={(v) => apply(edit(draft, (d) => void (d.credit.label = v)))} />
-          <Text label="Credit name" value={draft.credit.name} onChange={(v) => apply(edit(draft, (d) => void (d.credit.name = v)))} />
-          <Text label="Credit Instagram URL" value={draft.credit.instagram} onChange={(v) => apply(edit(draft, (d) => void (d.credit.instagram = v)))} />
-          <Text label="Credit phone (digits only)" value={draft.credit.phone} onChange={(v) => apply(edit(draft, (d) => void (d.credit.phone = v.replace(/[^0-9]/g, ""))))} />
-          <Text label="Credit phone display" value={draft.credit.phoneDisplay} onChange={(v) => apply(edit(draft, (d) => void (d.credit.phoneDisplay = v)))} />
         </Grid>
       </Card>
     </>
