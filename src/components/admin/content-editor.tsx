@@ -249,7 +249,7 @@ function HomeGroup({ draft, apply }: { draft: SiteContent; apply: Apply }) {
         <RepeaterStats draft={draft} apply={apply} />
       </Card>
 
-      <Card icon={<LayoutGrid size={16} />} title="Section visibility" description="Hide any section from the public site. The navbar and footer always stay.">
+      <Card icon={<LayoutGrid size={16} />} title="Section visibility" description="Hide any section from the public site. Its navbar and footer links hide with it.">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {SECTION_META.map(({ key, title }) => (
             <Toggle
@@ -261,7 +261,8 @@ function HomeGroup({ draft, apply }: { draft: SiteContent; apply: Apply }) {
           ))}
         </div>
         <p className="text-[12.5px] leading-relaxed text-muted">
-          The moving banner has its own show/hide control in the “Moving banner” tab.
+          The moving banner has its own show/hide control in the “Moving banner” tab. Hiding a
+          section also removes its link from the navbar and footer.
         </p>
       </Card>
     </>

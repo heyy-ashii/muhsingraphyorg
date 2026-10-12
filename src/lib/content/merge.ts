@@ -1,5 +1,5 @@
 import { DEFAULT_CONTENT } from "./defaults";
-import { SECTION_KEYS, type SectionKey, type SiteContent } from "./schema";
+import { SECTION_KEYS, type NavItem, type SectionKey, type SiteContent } from "./schema";
 
 type AnyRecord = Record<string, unknown>;
 
@@ -40,6 +40,28 @@ function merge(base: AnyRecord, override: unknown): AnyRecord {
 /** Reads the visibility flag for a section, defaulting to visible. */
 export function isSectionVisible(content: SiteContent, key: SectionKey): boolean {
   return content.visibility?.[key] ?? true;
+}
+
+/**
+ * Maps a nav/footer href to the page section it points at, so a link can be
+ * hidden whenever its section is. Only in-page anchors are mapped; any other
+ * href (a route, an external URL) has no section and is never filtered.
+ */
+export function sectionKeyForHref(href: string): SectionKey | null {
+  const hash = href.includes("#") ? href.slice(href.indexOf("#") + 1) : "";
+  if (!hash) return null;
+  return (SECTION_KEYS as readonly string[]).includes(hash) ? (hash as SectionKey) : null;
+}
+
+/**
+ * Drops nav/footer items whose target section the curator has hidden, so the
+ * chrome never links to something that is no longer on the page.
+ */
+export function visibleNav(content: SiteContent): NavItem[] {
+  return (content.nav ?? []).filter((item) => {
+    const key = sectionKeyForHref(item.href);
+    return key === null || isSectionVisible(content, key);
+  });
 }
 
 /** Normalises a stored row into a full document, tolerating any shape. */

@@ -140,8 +140,11 @@ done
 - The public site is **content-driven**. Every heading, paragraph, label, image,
   logo and section visibility is read from a single JSON document in the
   Supabase `site_content` table (one row, `id = 'default'`).
-- **Nav and footer chrome are intentionally fixed** — only the content *within*
-  them (brand, contact) is editable. There is no control for the nav links.
+- **Nav and footer links are derived, not curated.** There is still no control
+  to add, rename or reorder nav links, but a link whose target section the
+  curator has hidden (see `visibility`) is dropped from both the navbar and the
+  footer by `merge.ts#visibleNav`; anchor hrefs map to sections via
+  `sectionKeyForHref` and any non-anchor href is never filtered.
 - Files: `src/lib/content/{schema,defaults,merge,load,context,index}.ts`.
   `defaults.ts` is the canonical copy; `merge.ts#coerceContent` deep-merges any
   stored document over the defaults so a partial or older document still
