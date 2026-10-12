@@ -78,10 +78,16 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#F5F4F0" }],
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F5F4F0" },
+    { media: "(prefers-color-scheme: dark)", color: "#111111" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
+
+// Applies the stored theme before first paint so dark mode never flashes light.
+const themeBootstrap = `(function(){try{var t=localStorage.getItem("mhg-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}var r=document.documentElement;r.classList.toggle("dark",t==="dark");r.style.colorScheme=t;}catch(e){}})();`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const content = await getSiteContent();
@@ -91,6 +97,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       suppressHydrationWarning
       className={`${display.variable} ${sans.variable} ${mono.variable} ${arabic.variable}`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+      </head>
       <body className="min-h-dvh bg-canvas text-ink antialiased">
         <SiteContentProvider content={content}>
           <ThemeProvider>

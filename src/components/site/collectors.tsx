@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useSiteContent } from "@/lib/content/context";
 import { SECTION_INDEX } from "@/lib/content/defaults";
@@ -8,17 +9,18 @@ import { SectionHeading } from "./section-heading";
 export function Collectors() {
   const { collectors } = useSiteContent();
   const endorsements = collectors.endorsements ?? [];
+  const [showAll, setShowAll] = useState(false);
 
   if (!endorsements.length) return null;
+
+  const hasMore = endorsements.length > 3;
+  const visible = showAll ? endorsements : endorsements.slice(0, 3);
 
   return (
     <section
       id="collectors"
-      className="relative scroll-mt-28 overflow-hidden border-y border-line bg-canvas-2/40 py-24 sm:py-32"
+      className="relative scroll-mt-28 overflow-hidden border-y border-line bg-canvas-2 py-20 sm:py-28"
     >
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-      </div>
-
       <div className="shell">
         <SectionHeading
           index={SECTION_INDEX.collectors}
@@ -28,8 +30,8 @@ export function Collectors() {
           align="center"
         />
 
-        <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2">
-          {endorsements.map((item, i) => (
+        <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
+          {visible.map((item, i) => (
             <motion.figure
               key={`${item.name}-${i}`}
               initial={{ opacity: 0, y: 34 }}
@@ -66,6 +68,18 @@ export function Collectors() {
             </motion.figure>
           ))}
         </div>
+
+        {hasMore && !showAll && (
+          <div className="mt-10 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setShowAll(true)}
+              className="btn-ink h-11 px-6 text-sm"
+            >
+              <span>Show more</span>
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

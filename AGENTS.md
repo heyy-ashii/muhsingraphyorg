@@ -123,11 +123,16 @@ UI consistent with it:
 - **Navbar** is a full-width sticky bar (brand left, links beside it, lime
   "Enquire" CTA right). It no longer needs the compact-pill hack, because a
   sparse link set never leaves a void in a full-width bar.
-- **Light only.** The public site no longer boots a theme class; the dark
-  variant exists in `globals.css` for the admin portal. `ThemeToggle` is still
-  used by the admin dashboard but not by the site navbar.
-- Sections are evenly padded (`py-20 sm:py-28`) and headings are plain
-  (eyebrow + title + description), not indexed/ornamented.
+- **Light/dark is back.** Both themes are first-class again. An inline
+  bootstrap in `src/app/layout.tsx` reads `mhg-theme` (falling back to the OS
+  preference) and applies the `dark` class before first paint, so dark mode
+  never flashes light. The site navbar renders `ThemeToggle` (desktop, beside
+  the CTA) and again in the mobile sheet, alongside the admin dashboard's two.
+- **Section order mirrors orbiz.in**: hero → works → testimonials →
+  how-it-works → credentials → story → marquee → enquiry, i.e. `page.tsx`
+  renders Hero, WorksPavilion, Collectors, Process, Craft, Atelier, Ticker,
+  CommissionDesk. Sections share a `py-20 sm:py-28` rhythm with alternating
+  `bg-canvas-2` bands and plain headings (eyebrow + title + description).
 
 ## Works gallery (multi-image)
 

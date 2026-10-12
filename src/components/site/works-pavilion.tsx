@@ -35,7 +35,7 @@ export function WorksPavilion({ artworks }: { artworks: Artwork[] }) {
   }, [artworks, active]);
 
   return (
-    <section id="works" className="relative scroll-mt-28 py-24 sm:py-32">
+    <section id="works" className="relative scroll-mt-28 py-20 sm:py-28">
       <div className="shell">
         <SectionHeading
           index={SECTION_INDEX.works}
