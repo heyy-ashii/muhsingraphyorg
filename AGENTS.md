@@ -169,6 +169,9 @@ UI consistent with it:
   curator has hidden (see `visibility`) is dropped from both the navbar and the
   footer by `merge.ts#visibleNav`; anchor hrefs map to sections via
   `sectionKeyForHref` and any non-anchor href is never filtered.
+- When the navbar shows fewer than the full set of links (`nav.length < 4`) it
+  switches to a content-hugging, centred capsule on desktop (`lg:w-auto`), so a
+  sparse nav doesn't float in an empty full-width bar.
 - Files: `src/lib/content/{schema,defaults,merge,load,context,index}.ts`.
   `defaults.ts` is the canonical copy; `merge.ts#coerceContent` deep-merges any
   stored document over the defaults so a partial or older document still
