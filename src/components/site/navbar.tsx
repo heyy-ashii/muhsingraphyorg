@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { useSiteContent } from "@/lib/content/context";
+import { visibleNav } from "@/lib/content/merge";
 import { cn } from "@/lib/utils";
 import { BrandLockup } from "@/components/ui/brand-lockup";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function Navbar() {
-  const { nav, contact } = useSiteContent();
+  const content = useSiteContent();
+  const { contact } = content;
+  const nav = visibleNav(content);
   const { scrollY } = useScroll();
   const [condensed, setCondensed] = useState(false);
   const [open, setOpen] = useState(false);
@@ -54,12 +56,6 @@ export function Navbar() {
 
           <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
-            <Link
-              href="/#commissions"
-              className="btn-ink hidden h-10 items-center rounded-full px-5 font-mono text-[10px] uppercase tracking-[0.2em] sm:inline-flex"
-            >
-              <span>Commission Work</span>
-            </Link>
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
@@ -109,14 +105,7 @@ export function Navbar() {
                 transition={{ delay: 0.42, duration: 0.7 }}
                 className="mt-12"
               >
-                <Link
-                  href="/#commissions"
-                  onClick={() => setOpen(false)}
-                  className="btn-ink w-full rounded-full py-4 font-mono text-[11px] uppercase tracking-[0.24em]"
-                >
-                  <span>Commission Work</span>
-                </Link>
-                <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.24em] text-muted">
+                <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-muted">
                   {contact.whatsappDisplay} · {contact.city}
                 </p>
               </motion.div>

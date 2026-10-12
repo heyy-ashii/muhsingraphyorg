@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { ArrowUp, Lock } from "lucide-react";
 import { useSiteContent } from "@/lib/content/context";
+import { visibleNav } from "@/lib/content/merge";
 import { whatsappPhoneLink } from "@/lib/whatsapp";
 import { BrandLockup } from "@/components/ui/brand-lockup";
 import { BrandMark } from "@/components/ui/brand-mark";
 
 export function Footer() {
-  const { brand, contact, credit, nav } = useSiteContent();
+  const content = useSiteContent();
+  const { brand, contact, credit } = content;
+  const nav = visibleNav(content);
 
   const toTop = () => {
     const lenis = (window as unknown as { __lenis?: { scrollTo: (t: number, o?: object) => void } }).__lenis;
