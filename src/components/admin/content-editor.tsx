@@ -139,7 +139,7 @@ export function ContentEditor({
               onClick={() => setGroup(g.key)}
               aria-current={active}
               className={cn(
-                "inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors duration-300",
+                "inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors duration-300",
                 active
                   ? "border-gold/60 bg-gold/15 text-ink"
                   : "border-line bg-surface text-muted hover:border-gold/40 hover:text-ink",
