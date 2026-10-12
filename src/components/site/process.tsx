@@ -17,7 +17,7 @@ export function Process() {
   if (!steps.length) return null;
 
   return (
-    <section id="process" className="relative scroll-mt-28 py-24 sm:py-32">
+    <section id="process" className="relative scroll-mt-28 py-20 sm:py-28">
       <div className="shell">
         <SectionHeading
           index={SECTION_INDEX.process}

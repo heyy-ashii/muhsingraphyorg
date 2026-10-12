@@ -28,13 +28,15 @@ export default async function HomePage() {
     <>
       <Navbar />
       <main id="main">
+        {/* Section order mirrors orbiz.in: hero -> work -> testimonials ->
+            how it works -> credentials -> story -> marquee -> enquiry. */}
         <Hero artwork={featured} />
-        {visible("ticker") && <Ticker />}
         {visible("works") && <WorksPavilion artworks={artworks} />}
-        {visible("atelier") && <Atelier />}
-        {visible("craft") && <Craft />}
-        {visible("process") && <Process />}
         {visible("collectors") && <Collectors />}
+        {visible("process") && <Process />}
+        {visible("craft") && <Craft />}
+        {visible("atelier") && <Atelier />}
+        {visible("ticker") && <Ticker />}
         {visible("commissions") && <CommissionDesk />}
       </main>
       <Footer />

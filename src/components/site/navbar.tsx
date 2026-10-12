@@ -8,6 +8,7 @@ import { visibleNav } from "@/lib/content/merge";
 import { cn } from "@/lib/utils";
 import { buildGeneralMessage, whatsappLink } from "@/lib/whatsapp";
 import { BrandLockup } from "@/components/ui/brand-lockup";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export function Navbar() {
   const content = useSiteContent();
@@ -56,6 +57,7 @@ export function Navbar() {
           </ul>
 
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
+            <ThemeToggle />
             <a
               href={enquiryHref}
               target="_blank"
@@ -115,7 +117,11 @@ export function Navbar() {
               >
                 <span>Enquire via WhatsApp</span>
               </a>
-              <p className="mt-auto text-sm text-muted">
+              <div className="mt-6 flex items-center justify-between border-t border-line pt-6">
+                <span className="text-sm text-muted">Appearance</span>
+                <ThemeToggle />
+              </div>
+              <p className="mt-auto pt-6 text-sm text-muted">
                 {contact.whatsappDisplay} · {contact.city}
               </p>
             </div>

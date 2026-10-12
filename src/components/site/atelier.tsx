@@ -15,7 +15,7 @@ export function Atelier() {
   const imageY = useTransform(scrollYProgress, [0, 1], [60, -60]);
 
   return (
-    <section id="atelier" className="relative scroll-mt-28 overflow-hidden py-24 sm:py-32">
+    <section id="atelier" className="relative scroll-mt-28 overflow-hidden py-20 sm:py-28">
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
       </div>
 
