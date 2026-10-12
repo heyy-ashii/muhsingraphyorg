@@ -116,7 +116,7 @@ const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 
 export async function uploadArtworkMedia(
   file: File,
-  folder: "artworks" | "in-situ" | "brand" | "hero" | "atelier" = "artworks",
+  folder: "artworks" | "in-situ" | "brand" | "hero" | "atelier" | "collections" = "artworks",
 ) {
   if (!ALLOWED.includes(file.type)) {
     throw new Error(`${file.name}: only JPEG, PNG, WebP or AVIF images are accepted.`);

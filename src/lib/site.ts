@@ -18,6 +18,7 @@ export const SITE = {
   },
   nav: [
     { label: "Works", href: "#works" },
+    { label: "Collections", href: "#collections" },
     { label: "Atelier & Craft", href: "#atelier" },
     { label: "Process", href: "#process" },
     { label: "Private Commissions", href: "#commissions" },

@@ -169,6 +169,14 @@ UI consistent with it:
 - The public site is **content-driven**. Every heading, paragraph, label, image,
   logo and section visibility is read from a single JSON document in the
   Supabase `site_content` table (one row, `id = 'default'`).
+- **Collections section (orbiz-style category bands).** The home page carries a
+  `collections` section: one `CollectionCategory` per band, each pairing an
+  image (`imageSide`: `left`/`right`, sides alternate) with a headline, an intro
+  and a list of `CollectionItem` options (title, description, up to three `meta`
+  facts, optional `href`). Options with an empty `href` render as plain,
+  non-clickable rows. `SECTION_INDEX.collections` is `002`; the section is keyed
+  `#collections` and gets its own navbar/footer link via `SITE.nav`. Edits live
+  under the **Collections (ways to acquire)** panel in the admin editor.
 - **Nav and footer links are derived, not curated.** There is still no control
   to add, rename or reorder nav links, but a link whose target section the
   curator has hidden (see `visibility`) is dropped from both the navbar and the

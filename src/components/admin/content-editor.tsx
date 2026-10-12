@@ -56,11 +56,12 @@ const GROUPS: { key: GroupKey; label: string; icon: LucideIcon; hint: string }[]
 
 const SECTION_META: { key: SectionKey; title: string; index: string; hint: string; icon: LucideIcon }[] = [
   { key: "works", title: "Selected Works pavilion", index: "001", hint: "Heading, description and filter chips.", icon: LayoutGrid },
-  { key: "atelier", title: "About the artist", index: "002", hint: "Portrait, philosophy, quote and metrics.", icon: UserRound },
-  { key: "craft", title: "Sacred Craft & Materials", index: "003", hint: "The four instruments.", icon: Gem },
-  { key: "process", title: "Discipline & Methodology", index: "004", hint: "The four-step breakdown.", icon: Sparkles },
-  { key: "collectors", title: "Collector endorsements", index: "005", hint: "Quotes from patrons.", icon: Quote },
-  { key: "commissions", title: "Bespoke Commission Desk", index: "006", hint: "Form heading and direct channels.", icon: Building2 },
+  { key: "collections", title: "Collections (ways to acquire)", index: "002", hint: "Category bands with images, options and CTAs.", icon: Gem },
+  { key: "atelier", title: "About the artist", index: "003", hint: "Portrait, philosophy, quote and metrics.", icon: UserRound },
+  { key: "craft", title: "Sacred Craft & Materials", index: "004", hint: "The four instruments.", icon: Gem },
+  { key: "process", title: "Discipline & Methodology", index: "005", hint: "The four-step breakdown.", icon: Sparkles },
+  { key: "collectors", title: "Collector endorsements", index: "006", hint: "Quotes from patrons.", icon: Quote },
+  { key: "commissions", title: "Bespoke Commission Desk", index: "007", hint: "Form heading and direct channels.", icon: Building2 },
 ];
 
 export function ContentEditor({
@@ -278,6 +279,7 @@ function SectionsGroup({ draft, apply }: { draft: SiteContent; apply: Apply }) {
           {key === "works" && (
             <StringList label="Filter categories" items={draft.works.categories} onChange={(v) => apply(edit(draft, (d) => void (d.works.categories = v)))} placeholder="Category name" />
           )}
+          {key === "collections" && <CollectionsFields draft={draft} apply={apply} />}
           {key === "atelier" && <AtelierFields draft={draft} apply={apply} />}
           {key === "craft" && <CraftFields draft={draft} apply={apply} />}
           {key === "process" && <ProcessFields draft={draft} apply={apply} />}
@@ -400,6 +402,80 @@ function RepeaterStats({ draft, apply }: { draft: SiteContent; apply: Apply }) {
       ))}
       <AddButton label="Add stat" onClick={() => apply(edit(draft, (d) => void d.hero.stats.push({ label: "Label", value: "Value" })))} />
     </div>
+  );
+}
+
+function CollectionsFields({ draft, apply }: { draft: SiteContent; apply: Apply }) {
+  const bands = draft.collections.categories;
+  return (
+    <SubGroup title="Category bands">
+      <p className="text-[12.5px] leading-relaxed text-muted">
+        Each band pairs an image with a headline and a list of options. Turn a band’s
+        eyebrow into “Gifting”, “For business”, “For the home” or anything else.
+        Options with a link become clickable; leave the link empty to keep them as
+        plain descriptions.
+      </p>
+      <div className="space-y-4">
+        {bands.map((band, i) => (
+          <div key={i} className="space-y-4 rounded-xl border border-line bg-canvas-2/40 p-4">
+            <Grid>
+              <Text label="Eyebrow" value={band.eyebrow} onChange={(v) => apply(edit(draft, (d) => void (d.collections.categories[i].eyebrow = v)))} />
+              <Text label="Headline" value={band.title} onChange={(v) => apply(edit(draft, (d) => void (d.collections.categories[i].title = v)))} />
+            </Grid>
+            <Area label="Intro" value={band.body} rows={2} onChange={(v) => apply(edit(draft, (d) => void (d.collections.categories[i].body = v)))} />
+            <ImageField label="Band image" value={band.imageUrl} folder="collections" aspect="aspect-[4/3]" onChange={(v) => apply(edit(draft, (d) => void (d.collections.categories[i].imageUrl = v)))} />
+            <Segmented
+              label="Image side"
+              value={band.imageSide}
+              options={[
+                { value: "left", label: "Left" },
+                { value: "right", label: "Right" },
+              ]}
+              onChange={(v) => apply(edit(draft, (d) => void (d.collections.categories[i].imageSide = v as "left" | "right")))}
+            />
+            <Grid>
+              <Text label="Button label" value={band.ctaLabel} onChange={(v) => apply(edit(draft, (d) => void (d.collections.categories[i].ctaLabel = v)))} />
+              <Text label="Button link" value={band.ctaHref} onChange={(v) => apply(edit(draft, (d) => void (d.collections.categories[i].ctaHref = v)))} />
+            </Grid>
+
+            <div className="space-y-3 border-t border-line pt-4">
+              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gold">Options</p>
+              {band.items.map((item, j) => (
+                <div key={j} className="space-y-3 rounded-lg border border-line bg-canvas/60 p-3">
+                  <Grid>
+                    <Text label="Title" value={item.title} onChange={(v) => apply(edit(draft, (d) => void (d.collections.categories[i].items[j].title = v)))} />
+                    <Text label="Link (optional)" value={item.href} onChange={(v) => apply(edit(draft, (d) => void (d.collections.categories[i].items[j].href = v)))} />
+                  </Grid>
+                  <Area label="Description" value={item.description} rows={2} onChange={(v) => apply(edit(draft, (d) => void (d.collections.categories[i].items[j].description = v)))} />
+                  <StringList label="Meta tags" items={item.meta} onChange={(v) => apply(edit(draft, (d) => void (d.collections.categories[i].items[j].meta = v)))} placeholder="e.g. Made to order" />
+                  <RemoveButton label="Remove option" onClick={() => apply(edit(draft, (d) => void d.collections.categories[i].items.splice(j, 1)))} />
+                </div>
+              ))}
+              <AddButton label="Add option" onClick={() => apply(edit(draft, (d) => void d.collections.categories[i].items.push({ title: "New option", description: "", meta: [], href: "" })))} />
+            </div>
+
+            <RemoveButton label="Remove band" onClick={() => apply(edit(draft, (d) => void d.collections.categories.splice(i, 1)))} />
+          </div>
+        ))}
+        <AddButton
+          label="Add category band"
+          onClick={() =>
+            apply(
+              edit(draft, (d) => void d.collections.categories.push({
+                eyebrow: "New category",
+                title: "New band",
+                body: "",
+                imageUrl: "",
+                imageSide: "right",
+                items: [],
+                ctaLabel: "",
+                ctaHref: "#commissions",
+              })),
+            )
+          }
+        />
+      </div>
+    </SubGroup>
   );
 }
 
