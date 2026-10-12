@@ -13,6 +13,10 @@ export function Navbar() {
   const content = useSiteContent();
   const { contact } = content;
   const nav = visibleNav(content);
+  // Hiding sections leaves the nav with a few links; a full-width pill then
+  // floats them in a lot of empty space. Below the full set, size the pill to
+  // its contents and centre it instead.
+  const compact = nav.length < 4;
   const { scrollY } = useScroll();
   const [condensed, setCondensed] = useState(false);
   const [open, setOpen] = useState(false);
@@ -37,6 +41,9 @@ export function Navbar() {
             "pointer-events-auto flex w-full max-w-[1180px] items-center justify-between gap-4 rounded-full px-4 py-2.5 transition-all duration-700 ease-silk sm:px-6",
             "glass shadow-whisper",
             condensed ? "py-2" : "py-3",
+            // When sections are hidden the pill hugs its content so the few
+            // remaining links don't float in a wide, empty bar.
+            compact && "lg:w-auto lg:gap-10 lg:px-7",
           )}
         >
           <BrandLockup size="sm" />
