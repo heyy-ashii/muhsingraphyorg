@@ -125,7 +125,7 @@ export function ImageField({
   label: string;
   value: string;
   onChange: (v: string) => void;
-  folder?: "brand" | "hero" | "atelier" | "artworks" | "in-situ";
+  folder?: "brand" | "hero" | "atelier" | "artworks" | "in-situ" | "collections";
   aspect?: string;
 }) {
   const ref = useRef<HTMLInputElement>(null);

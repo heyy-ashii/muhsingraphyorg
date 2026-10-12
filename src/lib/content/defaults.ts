@@ -43,6 +43,7 @@ export const DEFAULT_CONTENT: SiteContent = {
   visibility: {
     ticker: true,
     works: true,
+    collections: true,
     atelier: true,
     craft: true,
     process: true,
@@ -72,6 +73,101 @@ export const DEFAULT_CONTENT: SiteContent = {
     description:
       "A rotating selection of originals from the atelier. Every piece is unique — hand-inked, gilded where noted, and released with a certificate of authenticity.",
     categories: [...CATEGORIES],
+  },
+  collections: {
+    eyebrow: "Ways to acquire",
+    lines: ["Made for", "your people."],
+    description:
+      "Three ways collectors and organisations come to the atelier. Every path is made to order, documented from first sketch to final frame.",
+    categories: [
+      {
+        eyebrow: "Gifting",
+        title: "Gifts they keep.",
+        body: "Pieces made for a person, not a wall. Share a name, a phrase or a date and Muhsin writes it into an original — framed, or finished to stand on its own.",
+        imageUrl: "/assets/artwork-01.jpg",
+        imageSide: "right",
+        items: [
+          {
+            title: "Name & monogram panels",
+            description: "A single name rendered in Thuluth, inked on archival paper and framed.",
+            meta: ["Made to order", "Proof first", "From A4 to A2"],
+            href: "",
+          },
+          {
+            title: "Verse & dedication pieces",
+            description: "A chosen ayah or dedication, composed and gilded where it clarifies the line.",
+            meta: ["24k gilding", "Museum framing", "Signed certificate"],
+            href: "",
+          },
+          {
+            title: "Keepsake miniatures",
+            description: "A small stand-alone panel with a name or date — an heirloom that fits a shelf.",
+            meta: ["Compact scale", "Gift-boxed", "Ready to gift"],
+            href: "",
+          },
+        ],
+        ctaLabel: "Commission a gift",
+        ctaHref: "#commissions",
+      },
+      {
+        eyebrow: "For business",
+        title: "Made with your mark, in any quantity.",
+        body: "For studios, institutions and events. Brand marks, Arabic wordmarks and commemorative panels — in hand-inked originals or archival giclée editions.",
+        imageUrl: "/assets/artwork-01-detail-01.jpg",
+        imageSide: "left",
+        items: [
+          {
+            title: "Brand wordmarks",
+            description: "A company name lettered by hand, then carried into signage and print.",
+            meta: ["Originals or editions", "Nationwide delivery", "Brand-ready files"],
+            href: "",
+          },
+          {
+            title: "Awards & commemorative panels",
+            description: "Presentation pieces for milestones, openings and honours.",
+            meta: ["Numbered editions", "Plaque mounting", "Worldwide shipping"],
+            href: "",
+          },
+          {
+            title: "Editioned giclée prints",
+            description: "Archival reproductions of an approved composition for teams and clients.",
+            meta: ["Limited editions", "Archival inks", "Bulk quantities"],
+            href: "",
+          },
+        ],
+        ctaLabel: "Start a business enquiry",
+        ctaHref: "#commissions",
+      },
+      {
+        eyebrow: "For the home",
+        title: "Made for your home.",
+        body: "Study pieces and structural panels, composed to a room. Scale, surface and palette are set with you before a single stroke is inked.",
+        imageUrl: "/assets/artwork-01-detail-02.jpg",
+        imageSide: "right",
+        items: [
+          {
+            title: "Monumental wall pieces",
+            description: "A full-wall composition built to the architecture of the space.",
+            meta: ["Site-specific scale", "Installation planned", "Studio consult"],
+            href: "",
+          },
+          {
+            title: "Study & shelf works",
+            description: "Smaller originals for a study, hallway or collection wall.",
+            meta: ["Collectible scale", "Ready to hang", "Original only"],
+            href: "",
+          },
+          {
+            title: "Panels & triptychs",
+            description: "A composition split across panels for long walls and stairwells.",
+            meta: ["Multi-panel", "Custom proportions", "Archival framing"],
+            href: "",
+          },
+        ],
+        ctaLabel: "Enquire for your home",
+        ctaHref: "#commissions",
+      },
+    ],
   },
   atelier: {
     eyebrow: "Atelier Muhsin",
@@ -230,11 +326,12 @@ export const DEFAULT_CONTENT: SiteContent = {
 /** Section counter shown beside each eyebrow (001, 002, …). */
 export const SECTION_INDEX: Record<string, string> = {
   works: "001",
-  atelier: "002",
-  craft: "003",
-  process: "004",
-  collectors: "005",
-  commissions: "006",
+  collections: "002",
+  atelier: "003",
+  craft: "004",
+  process: "005",
+  collectors: "006",
+  commissions: "007",
 };
 
 export { SECTION_KEYS };

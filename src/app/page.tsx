@@ -6,6 +6,7 @@ import { Navbar } from "@/components/site/navbar";
 import { Hero } from "@/components/site/hero";
 import { Ticker } from "@/components/site/ticker";
 import { WorksPavilion } from "@/components/site/works-pavilion";
+import { Collections } from "@/components/site/collections";
 import { Atelier } from "@/components/site/atelier";
 import { Craft } from "@/components/site/craft";
 import { Process } from "@/components/site/process";
@@ -28,10 +29,12 @@ export default async function HomePage() {
     <>
       <Navbar />
       <main id="main">
-        {/* Section order mirrors orbiz.in: hero -> work -> testimonials ->
-            how it works -> credentials -> story -> marquee -> enquiry. */}
+        {/* Section order mirrors orbiz.in: hero -> work -> ways to acquire
+            (category bands) -> testimonials -> how it works -> credentials ->
+            story -> marquee -> enquiry. */}
         <Hero artwork={featured} />
         {visible("works") && <WorksPavilion artworks={artworks} />}
+        {visible("collections") && <Collections />}
         {visible("collectors") && <Collectors />}
         {visible("process") && <Process />}
         {visible("craft") && <Craft />}

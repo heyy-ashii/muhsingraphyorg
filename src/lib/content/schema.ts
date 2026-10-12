@@ -12,6 +12,7 @@
 export const SECTION_KEYS = [
   "ticker",
   "works",
+  "collections",
   "atelier",
   "craft",
   "process",
@@ -46,6 +47,35 @@ export interface SectionHeadingCopy {
 
 export interface WorksSection extends SectionHeadingCopy {
   categories: string[];
+}
+
+/** A single product-style option inside a collection band. */
+export interface CollectionItem {
+  title: string;
+  /** Short supporting line shown under the title. */
+  description: string;
+  /** Up to three small facts — delivery, warranty, finishes. */
+  meta: string[];
+  /** Optional link. Empty renders a non-clickable card. */
+  href: string;
+}
+
+/** One orbiz-style category band: an image on one side, copy and options on the other. */
+export interface CollectionCategory {
+  title: string;
+  body: string;
+  imageUrl: string;
+  /** `left` or `right` — which side the image sits on. */
+  imageSide: "left" | "right";
+  items: CollectionItem[];
+  ctaLabel: string;
+  ctaHref: string;
+  /** Optional eyebrow override; falls back to the section eyebrow. */
+  eyebrow: string;
+}
+
+export interface CollectionsSection extends SectionHeadingCopy {
+  categories: CollectionCategory[];
 }
 
 export interface AtelierSection extends SectionHeadingCopy {
@@ -142,6 +172,7 @@ export interface SiteContent {
   ticker: string[];
   tickerStyle: TickerStyle;
   works: WorksSection;
+  collections: CollectionsSection;
   atelier: AtelierSection;
   craft: CraftSection;
   process: ProcessSection;
