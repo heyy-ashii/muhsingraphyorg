@@ -29,16 +29,12 @@ export function SectionHeading({
       )}
     >
       <div className={cn("max-w-2xl", centered && "mx-auto")}>
-        <div className={cn("flex items-center gap-4", centered && "justify-center")}>
-          <span className="font-mono text-[10px] tracking-[0.28em] text-gold">{index}</span>
-          <span className="h-px w-10 bg-gold/45" />
-          <span className="eyebrow">{eyebrow}</span>
-        </div>
-        <h2 className="mt-5 font-display text-display-md text-ink">
+        <p className="eyebrow">{eyebrow}</p>
+        <h2 className="mt-3 font-display text-display-md text-ink">
           <SplitLines lines={lines} />
         </h2>
         {description && (
-          <p className={cn("mt-5 max-w-[54ch] text-pretty text-[15.5px] leading-relaxed text-muted", centered && "mx-auto")}>
+          <p className={cn("mt-5 max-w-[54ch] text-pretty text-base leading-relaxed text-muted", centered && "mx-auto")}>
             {description}
           </p>
         )}

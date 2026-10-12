@@ -31,11 +31,11 @@ export function Process() {
           <div aria-hidden className="absolute left-[15px] top-2 hidden h-[calc(100%-2rem)] w-px bg-line sm:block lg:left-[calc(28%+15px)]">
             <motion.span
               style={{ scaleY, transformOrigin: "top" }}
-              className="absolute inset-x-0 top-0 h-full w-px bg-gradient-to-b from-gold-bright via-gold to-gold-deep"
+              className="absolute inset-x-0 top-0 h-full w-px bg-gradient-to-b from-lime via-forest to-forest"
             />
             <motion.span
               style={{ top: glowY }}
-              className="absolute -left-[3px] h-[7px] w-[7px] -translate-y-1/2 rounded-full bg-gold shadow-[0_0_18px_4px_rgba(200,162,97,0.55)]"
+              className="absolute -left-[5px] h-[11px] w-[11px] -translate-y-1/2 rounded-full border-2 border-canvas bg-forest"
             />
           </div>
 
@@ -51,37 +51,37 @@ export function Process() {
               >
                 {/* left meta (desktop) */}
                 <div className="hidden pr-10 text-right lg:block">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-muted">
+                  <p className="text-xs text-muted">
                     Step {step.n}
                   </p>
-                  <p className="mt-2 font-display text-4xl text-line">
+                  <p className="mt-2 font-display text-4xl font-semibold text-line">
                     {String(i + 1).padStart(2, "0")}
                   </p>
                 </div>
 
                 {/* node */}
                 <div className="hidden justify-center sm:flex">
-                  <span className="mt-1.5 flex h-[30px] w-[30px] items-center justify-center rounded-full border border-gold/45 bg-canvas">
-                    <span className="h-[7px] w-[7px] rotate-45 bg-gold" />
+                  <span className="mt-1.5 flex h-[30px] w-[30px] items-center justify-center rounded-full bg-forest text-xs font-semibold text-lime">
+                    {i + 1}
                   </span>
                 </div>
 
                 {/* content */}
                 <div className="lg:pl-10">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-gold lg:hidden">
+                  <p className="font-sans text-[10px] tracking-wide text-forest lg:hidden">
                     Step {step.n}
                   </p>
-                  <h3 className="mt-2 font-display text-[clamp(1.8rem,3.4vw,2.9rem)] leading-tight text-ink lg:mt-0">
+                  <h3 className="mt-2 font-display text-3xl font-semibold leading-tight text-ink lg:mt-0">
                     {step.title}
                   </h3>
-                  <p className="mt-4 max-w-[62ch] text-pretty text-[15.5px] leading-relaxed text-muted">
+                  <p className="mt-4 max-w-[62ch] text-pretty text-base leading-relaxed text-muted">
                     {step.body}
                   </p>
                   {step.meta?.length > 0 && (
                     <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-3">
                       {step.meta.map((m, mi) => (
-                        <li key={`${m}-${mi}`} className="flex items-center gap-2.5 font-mono text-[9px] uppercase tracking-[0.2em] text-ink-soft">
-                          <span aria-hidden className="h-px w-5 bg-gold/60" />
+                        <li key={`${m}-${mi}`} className="flex items-center gap-2.5 text-xs text-ink-soft">
+                          <span aria-hidden className="h-px w-5 bg-forest/60" />
                           {m}
                         </li>
                       ))}

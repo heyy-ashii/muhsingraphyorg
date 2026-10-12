@@ -98,12 +98,36 @@ done
   this, so do not reintroduce `min-h-dvh` on the shell.
 - **The dashboard keeps its own light/dark toggle.** It reuses the shared
   `ThemeToggle` (`src/components/ui/theme-toggle.tsx`) — once in the sidebar
-  ("Appearance") and once in the mobile header. Both drive the same
-  `ThemeProvider` / `mhg-theme` key as the public site, so the choice carries
-  across. Don't drop either control.
+  ("Appearance") and once in the mobile header. `ThemeProvider` still wraps the
+  app in `src/app/layout.tsx`, but the public site no longer boots a theme class
+  and the site navbar has no toggle, so the choice now only affects the admin
+  portal. Don't drop either admin control.
 - Design tokens are CSS variables in `src/app/globals.css`, surfaced to Tailwind
   in `tailwind.config.ts`. Use token classes (`text-ink`, `bg-canvas`,
-  `border-line`, `text-gold`) rather than raw hex.
+  `border-line`, `bg-forest`, `bg-lime`, `text-coral`) rather than raw hex.
+
+## Design language (orbiz-inspired)
+
+The public site was rebuilt to match the visual language of orbiz.in. Keep new
+UI consistent with it:
+
+- **One typeface: Poppins** (`--font-sans`, `--font-display`, `--font-mono` all
+  point at it). Headings are 600 weight with tight negative tracking. No serif,
+  no monospace, no italics on display copy.
+- **Palette**: off-white canvas `#F5F4F0`, near-black ink `#111111`, forest
+  green `#2F4A32`, lime `#F3FC81`, coral `#D0473E`. `gold*` tokens map onto the
+  lime/forest accents so legacy class names still resolve.
+- **Shape & depth**: pill buttons (`rounded-full`), rounded-2xl/3xl cards,
+  flat surfaces with at most `shadow-whisper`. No gold gradients, glass blur,
+  grain overlay, or magnetic cursor — those components were deleted.
+- **Navbar** is a full-width sticky bar (brand left, links beside it, lime
+  "Enquire" CTA right). It no longer needs the compact-pill hack, because a
+  sparse link set never leaves a void in a full-width bar.
+- **Light only.** The public site no longer boots a theme class; the dark
+  variant exists in `globals.css` for the admin portal. `ThemeToggle` is still
+  used by the admin dashboard but not by the site navbar.
+- Sections are evenly padded (`py-20 sm:py-28`) and headings are plain
+  (eyebrow + title + description), not indexed/ornamented.
 
 ## Works gallery (multi-image)
 

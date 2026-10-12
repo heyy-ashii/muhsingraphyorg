@@ -61,7 +61,7 @@ export function ArtworkDetailViewer({ artwork }: { artwork: Artwork }) {
         <button
           type="button"
           onClick={() => setLensOn((v) => !v)}
-          className="hidden items-center gap-2 rounded-full border border-line px-4 py-2 font-mono text-[9px] uppercase tracking-[0.2em] text-ink transition-colors hover:border-gold/60 hover:text-gold md:inline-flex"
+          className="hidden items-center gap-2 rounded-full border border-line px-4 py-2 text-xs text-ink transition-colors hover:border-forest/60 hover:text-forest md:inline-flex"
         >
           {lensOn ? <Minimize2 size={11} /> : <Maximize2 size={11} />}
           {lensOn ? "Lens on" : "Zoom lens"}
@@ -105,7 +105,7 @@ export function ArtworkDetailViewer({ artwork }: { artwork: Artwork }) {
               type="button"
               onClick={() => go(-1)}
               aria-label="Previous image"
-              className="absolute left-4 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/85 backdrop-blur-sm transition-colors hover:border-gold/60 hover:text-gold"
+              className="absolute left-4 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/85 backdrop-blur-sm transition-colors hover:border-forest/60 hover:text-forest"
             >
               <ChevronLeft size={18} />
             </button>
@@ -113,11 +113,11 @@ export function ArtworkDetailViewer({ artwork }: { artwork: Artwork }) {
               type="button"
               onClick={() => go(1)}
               aria-label="Next image"
-              className="absolute right-4 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/85 backdrop-blur-sm transition-colors hover:border-gold/60 hover:text-gold"
+              className="absolute right-4 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/85 backdrop-blur-sm transition-colors hover:border-forest/60 hover:text-forest"
             >
               <ChevronRight size={18} />
             </button>
-            <span className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/20 bg-black/45 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.22em] text-white/80 backdrop-blur-sm">
+            <span className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/20 bg-black/45 px-3 py-1 text-xs text-white/80 backdrop-blur-sm">
               {index + 1} / {images.length}
             </span>
           </>
@@ -130,7 +130,7 @@ export function ArtworkDetailViewer({ artwork }: { artwork: Artwork }) {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.7 }}
               transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
-              className="pointer-events-none absolute z-20 hidden overflow-hidden rounded-full border border-gold/60 shadow-gilding md:block"
+              className="pointer-events-none absolute z-20 hidden overflow-hidden rounded-full border border-forest/60 shadow-gilding md:block"
               style={{
                 width: LENS,
                 height: LENS,
@@ -142,7 +142,7 @@ export function ArtworkDetailViewer({ artwork }: { artwork: Artwork }) {
                 backgroundRepeat: "no-repeat",
               }}
             >
-              <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/55 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.2em] text-white/80">
+              <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/55 px-2 py-0.5 font-sans text-[8px] tracking-wide text-white/80">
                 {ZOOM.toFixed(1)}× lens
               </span>
             </motion.div>
@@ -164,11 +164,11 @@ export function ArtworkDetailViewer({ artwork }: { artwork: Artwork }) {
               aria-current={i === index}
               className={cn(
                 "relative aspect-square overflow-hidden border transition-colors duration-300",
-                i === index ? "border-gold" : "border-line hover:border-gold/50",
+                i === index ? "border-forest" : "border-line hover:border-forest/50",
               )}
             >
               <Image src={src} alt="" fill sizes="140px" className="object-cover" />
-              {i === index && <span aria-hidden className="absolute inset-0 ring-1 ring-inset ring-gold/70" />}
+              {i === index && <span aria-hidden className="absolute inset-0 ring-1 ring-inset ring-forest/70" />}
             </button>
           ))}
         </div>

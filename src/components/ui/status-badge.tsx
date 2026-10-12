@@ -3,18 +3,18 @@ import type { ArtworkStatus } from "@/lib/types";
 
 const TONE: Record<string, { label: string; className: string; dot: string }> = {
   Available: {
-    label: "Available for Acquisition",
-    className: "border-gold/45 bg-gold/10 text-gold-deep dark:text-gold",
-    dot: "bg-gold",
+    label: "Available",
+    className: "border-forest/30 bg-forest/10 text-forest",
+    dot: "bg-forest",
   },
   Reserved: {
     label: "Reserved",
-    className: "border-amber-600/40 bg-amber-500/10 text-amber-700 dark:text-amber-400",
-    dot: "bg-amber-500",
+    className: "border-coral/30 bg-coral/10 text-coral",
+    dot: "bg-coral",
   },
   "Private Collection": {
-    label: "In Private Collection",
-    className: "border-line bg-canvas-2/70 text-muted",
+    label: "Private collection",
+    className: "border-line bg-canvas-2 text-muted",
     dot: "bg-muted",
   },
 };
@@ -34,8 +34,8 @@ export function StatusBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border font-mono uppercase backdrop-blur-md",
-        size === "sm" ? "px-2.5 py-1 text-[9px] tracking-[0.18em]" : "px-3.5 py-1.5 text-[10px] tracking-[0.22em]",
+        "inline-flex items-center gap-2 rounded-full border font-sans font-medium",
+        size === "sm" ? "px-2.5 py-1 text-[11px]" : "px-3.5 py-1.5 text-xs",
         tone.className,
         className,
       )}

@@ -25,7 +25,7 @@ export function ArtworkCard({ artwork, index, className, aspect = "aspect-[4/5]"
   const { contact } = useSiteContent();
   const gallery = galleryOf(artwork);
   const media = (
-    <div className={cn("relative overflow-hidden bg-canvas-2", aspect)}>
+    <div className={cn("relative overflow-hidden rounded-2xl bg-canvas-2", aspect)}>
       <Image
         src={artwork.image_url}
         alt={`${artwork.title} — ${artwork.script_style} calligraphy by Muhsin`}
@@ -33,30 +33,25 @@ export function ArtworkCard({ artwork, index, className, aspect = "aspect-[4/5]"
         sizes="(max-width: 768px) 100vw, (max-width: 1280px) 55vw, 45vw"
         placeholder="blur"
         blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPScxNicgaGVpZ2h0PScyMCc+PHJlY3Qgd2lkdGg9JzE2JyBoZWlnaHQ9JzIwJyBmaWxsPScjZTZlMGQ2Jy8+PC9zdmc+"
-        className="object-cover transition-transform duration-[1400ms] ease-silk group-hover/card:scale-[1.045]"
+        className="object-cover transition-transform duration-500 ease-out group-hover/card:scale-[1.04]"
       />
 
       <span
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/45 via-transparent to-transparent opacity-0 transition-opacity duration-700 group-hover/card:opacity-100"
       />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gold-sheen bg-[length:250%_100%] opacity-0 mix-blend-overlay transition-opacity duration-700 group-hover/card:opacity-[0.18]"
-      />
-
       <span className="pointer-events-none absolute left-4 top-4 z-10">
         <StatusBadge status={artwork.status} size="sm" />
       </span>
 
       {gallery.length > 1 && (
-        <span className="pointer-events-none absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-black/40 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-white/85 backdrop-blur-sm">
+        <span className="pointer-events-none absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white">
           <Images size={11} />
           {gallery.length}
         </span>
       )}
 
-      <span className="pointer-events-none absolute bottom-4 left-4 z-10 font-mono text-[10px] uppercase tracking-[0.24em] text-white/0 transition-colors duration-700 group-hover/card:text-white/85">
+      <span className="pointer-events-none absolute bottom-4 left-4 z-10 font-sans text-xs font-medium text-white/0 transition-colors duration-300 group-hover/card:text-white/90">
         {artwork.script_style} · {artwork.year}
       </span>
     </div>
@@ -76,7 +71,7 @@ export function ArtworkCard({ artwork, index, className, aspect = "aspect-[4/5]"
           onClick={() => onOpen(artwork)}
           data-cursor="VIEW PIECE"
           aria-label={`Open details for ${artwork.title}`}
-          className="block w-full cursor-pointer text-left outline-none focus-visible:ring-1 focus-visible:ring-gold/60"
+          className="block w-full cursor-pointer text-left outline-none focus-visible:ring-1 focus-visible:ring-forest/60"
         >
           {media}
         </button>
@@ -85,7 +80,7 @@ export function ArtworkCard({ artwork, index, className, aspect = "aspect-[4/5]"
           href={`/works/${artwork.id}`}
           data-cursor="VIEW PIECE"
           aria-label={`View ${artwork.title}`}
-          className="block outline-none focus-visible:ring-1 focus-visible:ring-gold/60"
+          className="block outline-none focus-visible:ring-1 focus-visible:ring-forest/60"
         >
           {media}
         </Link>
@@ -94,12 +89,12 @@ export function ArtworkCard({ artwork, index, className, aspect = "aspect-[4/5]"
       <div className="mt-5 flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex items-baseline gap-3">
-            <span className="font-mono text-[10px] tracking-[0.22em] text-gold">{pad(index + 1, 3)}</span>
-            <h3 className="truncate font-display text-2xl leading-tight text-ink sm:text-[26px]">
+            <span className="text-xs font-semibold text-forest">{pad(index + 1, 3)}</span>
+            <h3 className="truncate font-display text-xl font-semibold leading-tight text-ink">
               {artwork.title}
             </h3>
           </div>
-          <p className="mt-1.5 max-w-[38ch] truncate font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+          <p className="mt-1.5 max-w-[38ch] truncate text-sm text-muted">
             {artwork.dimensions}
           </p>
         </div>
@@ -114,7 +109,7 @@ export function ArtworkCard({ artwork, index, className, aspect = "aspect-[4/5]"
         <AcquireButton href={artworkWhatsappLink(artwork, undefined, contact.whatsappNumber)} size="sm" />
         <Link
           href={`/works/${artwork.id}`}
-          className="btn-gold h-9 items-center px-4 font-mono text-[10px] uppercase tracking-[0.2em]"
+          className="btn-gold h-9 items-center px-4 text-xs"
         >
           <span>View piece</span>
         </Link>

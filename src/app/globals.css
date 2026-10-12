@@ -3,52 +3,60 @@
 @tailwind utilities;
 
 /* ============================================================
-   MUHSINGRAPHY — Haute Atelier design tokens
-   Light: "Archival Parchment & Ink"   Dark: "Obsidian & Liquid Gold"
+   MUHSINGRAPHY — Orbiz-inspired design tokens
+   Off-white canvas, Poppins, black + lime + coral, flat pills
    ============================================================ */
 
 :root {
-  /* Light mode — Archival Parchment & Ink */
-  --canvas: 250 248 245;      /* #FAF8F5 silk ivory */
-  --canvas-2: 243 239 232;    /* #F3EFE8 warm limestone */
-  --surface: 255 255 255;     /* #FFFFFF warm white */
-  --line: 232 227 217;        /* #E8E3D9 whisper border */
-  --ink: 18 18 18;            /* #121212 sumi ink */
-  --ink-soft: 45 43 41;       /* #2D2B29 warm charcoal */
-  --muted: 120 114 106;       /* #78726A weathered slate */
-  --gold: 200 162 97;         /* #C8A261 brushed 24k */
-  --gold-bright: 212 175 55;  /* #D4AF37 */
-  --gold-deep: 137 97 49;
+  /* Light mode — clean, bright, product-forward */
+  --canvas: 245 244 240;      /* #F5F4F0 warm off-white */
+  --canvas-2: 235 234 228;    /* #EBEAE4 muted panel */
+  --surface: 255 255 255;     /* #FFFFFF card */
+  --line: 229 229 229;        /* #E5E5E5 hairline */
+  --ink: 17 17 17;            /* #111111 near-black */
+  --ink-soft: 42 42 38;       /* #2A2A26 heading */
+  --muted: 107 107 107;       /* #6B6B6B secondary text */
+  --gold: 233 248 129;        /* #E9F881 lime accent (was gold) */
+  --gold-bright: 243 252 129; /* #F3FC81 lime bright */
+  --gold-deep: 47 74 50;      /* #2F4A32 forest (accent deep) */
+
+  --coral: 208 71 62;         /* #D0473E coral */
+  --forest: 47 74 50;         /* #2F4A32 deep green */
+  --lime: 243 252 129;        /* #F3FC81 lime */
 
   --glass: 255 255 255;
-  --glass-alpha: 0.68;
-  --hairline: 232 227 217;
+  --glass-alpha: 0.9;
+  --hairline: 229 229 229;
 
-  --grain-opacity: 0.035;
-  --selection-bg: 200 162 97;
-  --selection-fg: 255 255 255;
+  --grain-opacity: 0;
+  --selection-bg: 243 252 129;
+  --selection-fg: 17 17 17;
 }
 
 .dark {
-  /* Night mode — Obsidian & Liquid Gold */
-  --canvas: 10 10 11;         /* #0A0A0B museum obsidian */
-  --canvas-2: 17 17 19;       /* #111113 velvet black */
-  --surface: 22 22 26;        /* smoked glass base */
-  --line: 46 44 42;           /* hairline */
-  --ink: 237 236 232;         /* #EDECE8 warm moonlight */
-  --ink-soft: 214 211 203;
-  --muted: 150 145 137;
-  --gold: 229 186 115;        /* #E5BA73 luminous liquid gold */
-  --gold-bright: 240 205 140;
-  --gold-deep: 200 162 97;
+  /* Dark variant — kept for the admin portal, not used on the public site */
+  --canvas: 17 17 17;         /* #111111 */
+  --canvas-2: 26 26 26;       /* #1A1A1A */
+  --surface: 23 23 23;        /* #171717 */
+  --line: 46 46 46;           /* #2E2E2E */
+  --ink: 245 244 240;
+  --ink-soft: 235 234 228;
+  --muted: 150 150 150;
+  --gold: 233 248 129;
+  --gold-bright: 243 252 129;
+  --gold-deep: 200 220 90;
 
-  --glass: 22 22 26;
-  --glass-alpha: 0.62;
-  --hairline: 200 162 97;
+  --coral: 224 98 90;
+  --forest: 90 130 95;
+  --lime: 243 252 129;
 
-  --grain-opacity: 0.05;
-  --selection-bg: 229 186 115;
-  --selection-fg: 10 10 11;
+  --glass: 23 23 23;
+  --glass-alpha: 0.85;
+  --hairline: 46 46 46;
+
+  --grain-opacity: 0;
+  --selection-bg: 243 252 129;
+  --selection-fg: 17 17 17;
 }
 
 * {
@@ -95,104 +103,95 @@ html.lenis, html.lenis body { height: auto; }
 
 @layer base {
   h1, h2, h3, h4 {
-    font-family: var(--font-display), Georgia, serif;
-    font-weight: 400;
-    letter-spacing: -0.015em;
+    font-family: var(--font-sans), system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.02em;
   }
+  h1 { letter-spacing: -0.035em; }
 }
 
 @layer components {
   .shell {
     width: 100%;
-    max-width: 1560px;
+    max-width: 1280px;
     margin-inline: auto;
-    padding-inline: clamp(1.25rem, 4.2vw, 4.5rem);
+    padding-inline: clamp(1.1rem, 4vw, 3rem);
   }
 
   .eyebrow {
-    font-family: var(--font-mono), ui-monospace, monospace;
-    font-size: 0.6875rem;
-    letter-spacing: 0.34em;
-    text-transform: uppercase;
+    font-family: var(--font-sans), system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: none;
     color: rgb(var(--muted));
   }
 
   .gold-text {
-    background: linear-gradient(
-      100deg,
-      rgb(var(--gold-deep)) 0%,
-      rgb(var(--gold-bright)) 38%,
-      rgb(var(--gold)) 62%,
-      rgb(var(--gold-deep)) 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: rgb(var(--ink));
   }
 
   .gold-rule {
     height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgb(var(--gold) / 0.55),
-      transparent
-    );
+    background: rgb(var(--line));
   }
 
   .glass {
     background-color: rgb(var(--glass) / var(--glass-alpha));
-    backdrop-filter: blur(22px) saturate(1.4);
-    -webkit-backdrop-filter: blur(22px) saturate(1.4);
-    border: 1px solid rgb(var(--hairline) / 0.5);
+    backdrop-filter: blur(14px) saturate(1.1);
+    -webkit-backdrop-filter: blur(14px) saturate(1.1);
+    border: 1px solid rgb(var(--hairline));
   }
 
   .dark .glass {
     background-color: rgb(var(--glass) / var(--glass-alpha));
-    border-color: rgb(var(--hairline) / 0.16);
+    border-color: rgb(var(--hairline));
   }
 
   .hairline { border: 1px solid rgb(var(--line)); }
-  .hairline-gold { border: 1px solid rgb(var(--gold) / 0.28); }
+  .hairline-gold { border: 1px solid rgb(var(--line)); }
 
   .btn-gold {
     position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
     overflow: hidden;
-    border: 1px solid rgb(var(--gold) / 0.55);
-    color: rgb(var(--gold-deep));
-    background: transparent;
-    transition: color 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-      border-color 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    border: 1px solid rgb(var(--ink));
+    border-radius: 999px;
+    font-weight: 600;
+    color: rgb(var(--ink));
+    background: rgb(var(--gold-bright));
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   }
-  .dark .btn-gold { color: rgb(var(--gold)); }
+  .dark .btn-gold { color: rgb(var(--ink)); }
   .btn-gold > * { position: relative; z-index: 2; }
   .btn-gold::before {
     content: "";
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: linear-gradient(120deg, rgb(var(--gold-deep)), rgb(var(--gold-bright)));
+    background: rgb(var(--ink));
     transform: translateY(101%);
-    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .btn-gold:hover { color: #fff; border-color: rgb(var(--gold-bright)); }
-  .dark .btn-gold:hover { color: #0a0a0b; }
+  .btn-gold:hover { color: rgb(var(--canvas)); border-color: rgb(var(--ink)); }
+  .dark .btn-gold:hover { color: rgb(var(--canvas)); }
   .btn-gold:hover::before { transform: translateY(0); }
 
   .btn-ink {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
+    border-radius: 999px;
+    font-weight: 600;
     background: rgb(var(--ink));
     color: rgb(var(--canvas));
-    transition: background 0.4s cubic-bezier(0.22, 1, 0.36, 1), color 0.4s;
+    transition: background 0.3s ease, color 0.3s ease;
   }
-  .btn-ink:hover { background: rgb(var(--gold-deep)); color: #fff; }
+  .btn-ink:hover { background: rgb(var(--forest)); color: #fff; }
 
   .link-underline {
     position: relative;

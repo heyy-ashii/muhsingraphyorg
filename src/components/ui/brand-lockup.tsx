@@ -13,9 +13,9 @@ interface BrandLockupProps {
 }
 
 const SIZES = {
-  sm: { mark: 30, word: "text-[15px] tracking-[0.34em]" },
-  md: { mark: 40, word: "text-[18px] tracking-[0.38em]" },
-  lg: { mark: 56, word: "text-[24px] tracking-[0.42em]" },
+  sm: { mark: 28, word: "text-[16px]" },
+  md: { mark: 36, word: "text-[19px]" },
+  lg: { mark: 48, word: "text-[26px]" },
 } as const;
 
 export function BrandLockup({
@@ -33,7 +33,7 @@ export function BrandLockup({
       <span className="relative inline-flex shrink-0 items-center justify-center">
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-full bg-gold/25 opacity-0 blur-md transition-opacity duration-700 group-hover:opacity-100"
+          className="pointer-events-none absolute inset-0 rounded-full bg-forest/25 opacity-0 blur-md transition-opacity duration-700 group-hover:opacity-100"
         />
         <BrandMark size={s.mark} priority className="relative transition-transform duration-700 group-hover:scale-[1.06]" />
       </span>
@@ -41,18 +41,14 @@ export function BrandLockup({
         <span className="flex flex-col leading-none">
           <span
             className={cn(
-              "relative overflow-hidden font-display uppercase text-ink transition-colors duration-500",
+              "font-display font-semibold text-ink transition-colors duration-300",
               s.word,
             )}
           >
-            <span className="relative z-10">{title}</span>
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-0 -translate-x-full bg-gold-sheen bg-[length:220%_100%] opacity-0 transition-all duration-[1100ms] ease-silk group-hover:translate-x-0 group-hover:opacity-100"
-            />
+            {title}
           </span>
           {brand.subtitle && (
-            <span className="mt-1 font-mono text-[8px] uppercase tracking-[0.3em] text-muted">
+            <span className="mt-1 font-sans text-[10px] text-muted">
               {brand.subtitle}
             </span>
           )}
@@ -63,7 +59,7 @@ export function BrandLockup({
 
   if (!href) return content;
   return (
-    <Link href={href} aria-label={`${title} — home`} className="outline-none focus-visible:ring-1 focus-visible:ring-gold/60">
+    <Link href={href} aria-label={`${title} — home`} className="outline-none focus-visible:ring-1 focus-visible:ring-forest/60">
       {content}
     </Link>
   );

@@ -17,7 +17,6 @@ export function Atelier() {
   return (
     <section id="atelier" className="relative scroll-mt-28 overflow-hidden py-24 sm:py-32">
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute right-[-10%] top-1/4 h-[520px] w-[520px] rounded-full bg-gold/[0.06] blur-[130px]" />
       </div>
 
       <div className="shell">
@@ -32,13 +31,13 @@ export function Atelier() {
           {/* studio portrait */}
           <motion.div style={{ y: imageY }} className="relative">
             <Reveal>
-              <div className="relative aspect-[4/5] overflow-hidden border border-line bg-canvas-2 shadow-gallery">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-line bg-canvas-2">
                 <Image
                   src={atelier.imageUrl || "/assets/artwork-01.jpg"}
                   alt="Muhsin at the atelier, working a calligraphic composition"
                   fill
                   sizes="(max-width: 1024px) 100vw, 42vw"
-                  className="object-cover grayscale-[0.85] contrast-[1.12] transition-all duration-1000 hover:grayscale-0 hover:contrast-100"
+                  className="object-cover"
                 />
                 <span
                   aria-hidden
@@ -48,7 +47,7 @@ export function Atelier() {
                   <p className="font-arabic text-3xl text-white/90" dir="rtl">
                     {brand.arabicName}
                   </p>
-                  <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.24em] text-white/70">
+                  <p className="mt-2 font-sans text-[9px] tracking-wide text-white/70">
                     {atelier.imageCaption}
                   </p>
                 </div>
@@ -57,11 +56,11 @@ export function Atelier() {
 
             {atelier.quote && (
               <Reveal delay={0.15} className="mt-6">
-                <blockquote className="border-l border-gold/40 pl-5">
-                  <p className="font-display text-[22px] italic leading-snug text-ink">
+                <blockquote className="border-l-2 border-forest pl-5">
+                  <p className="font-display text-xl leading-snug text-ink">
                     &ldquo;{atelier.quote}&rdquo;
                   </p>
-                  <footer className="mt-3 font-mono text-[9px] uppercase tracking-[0.22em] text-muted">
+                  <footer className="mt-3 text-xs text-muted">
                     {atelier.quoteAttribution}
                   </footer>
                 </blockquote>
@@ -73,7 +72,7 @@ export function Atelier() {
           <div>
             {atelier.intro && (
               <Reveal>
-                <p className="text-pretty text-[17px] leading-relaxed text-ink-soft">{atelier.intro}</p>
+                <p className="text-pretty text-lg leading-relaxed text-ink-soft">{atelier.intro}</p>
               </Reveal>
             )}
 
@@ -82,8 +81,8 @@ export function Atelier() {
                 {atelier.philosophy.map((item, i) => (
                   <Reveal key={`${item.title}-${i}`} delay={0.08 * i}>
                     <div className="grid grid-cols-1 gap-3 py-6 sm:grid-cols-[180px_1fr] sm:gap-8">
-                      <h3 className="font-display text-[21px] leading-tight text-ink">{item.title}</h3>
-                      <p className="text-pretty text-[14.5px] leading-relaxed text-muted">{item.body}</p>
+                      <h3 className="font-display text-lg font-semibold leading-tight text-ink">{item.title}</h3>
+                      <p className="text-pretty text-sm leading-relaxed text-muted">{item.body}</p>
                     </div>
                   </Reveal>
                 ))}
@@ -97,7 +96,7 @@ export function Atelier() {
                     <p className="font-display text-[clamp(2.4rem,5vw,3.6rem)] leading-none text-ink">
                       <Counter to={m.value} suffix={m.suffix} />
                     </p>
-                    <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.22em] text-muted">
+                    <p className="mt-3 text-xs text-muted">
                       {m.label}
                     </p>
                   </Reveal>

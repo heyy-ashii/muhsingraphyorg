@@ -107,7 +107,7 @@ export function ArtworkModal({
                 <button
                   type="button"
                   onClick={() => setLensOn((v) => !v)}
-                  className="hidden items-center gap-2 rounded-full border border-white/15 px-3 py-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-white/70 transition-colors duration-500 hover:border-gold/60 hover:text-gold md:inline-flex"
+                  className="hidden items-center gap-2 rounded-full border border-white/15 px-3 py-1.5 text-xs text-white/70 transition-colors duration-500 hover:border-forest/60 hover:text-forest md:inline-flex"
                 >
                   {lensOn ? <Minimize2 size={11} /> : <Maximize2 size={11} />}
                   {lensOn ? "Lens on" : "Zoom lens"}
@@ -151,7 +151,7 @@ export function ArtworkModal({
                       type="button"
                       onClick={() => go(-1)}
                       aria-label="Previous image"
-                      className="absolute left-3 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/85 backdrop-blur-sm transition-colors hover:border-gold/60 hover:text-gold sm:left-5"
+                      className="absolute left-3 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/85 backdrop-blur-sm transition-colors hover:border-forest/60 hover:text-forest sm:left-5"
                     >
                       <ChevronLeft size={18} />
                     </button>
@@ -159,11 +159,11 @@ export function ArtworkModal({
                       type="button"
                       onClick={() => go(1)}
                       aria-label="Next image"
-                      className="absolute right-3 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/85 backdrop-blur-sm transition-colors hover:border-gold/60 hover:text-gold sm:right-5"
+                      className="absolute right-3 top-1/2 z-20 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/35 text-white/85 backdrop-blur-sm transition-colors hover:border-forest/60 hover:text-forest sm:right-5"
                     >
                       <ChevronRight size={18} />
                     </button>
-                    <span className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/20 bg-black/45 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.22em] text-white/80 backdrop-blur-sm">
+                    <span className="absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded-full border border-white/20 bg-black/45 px-3 py-1 text-xs text-white/80 backdrop-blur-sm">
                       {index + 1} / {images.length}
                     </span>
                   </>
@@ -177,7 +177,7 @@ export function ArtworkModal({
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.7 }}
                       transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                      className="pointer-events-none absolute z-20 hidden overflow-hidden rounded-full border border-gold/60 shadow-gilding md:block"
+                      className="pointer-events-none absolute z-20 hidden overflow-hidden rounded-full border border-forest/60 shadow-gilding md:block"
                       style={{
                         width: LENS,
                         height: LENS,
@@ -190,14 +190,14 @@ export function ArtworkModal({
                       }}
                     >
                       <span className="absolute inset-0 rounded-full ring-1 ring-inset ring-white/25" />
-                      <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/55 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.2em] text-white/80">
+                      <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/55 px-2 py-0.5 font-sans text-[8px] tracking-wide text-white/80">
                         {ZOOM.toFixed(1)}× lens
                       </span>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-                <span className="pointer-events-none absolute bottom-4 right-5 hidden font-mono text-[9px] uppercase tracking-[0.24em] text-white/35 md:block">
+                <span className="pointer-events-none absolute bottom-4 right-5 hidden text-xs text-white/35 md:block">
                   Hover to inspect stroke &amp; gilding
                 </span>
               </div>
@@ -217,7 +217,7 @@ export function ArtworkModal({
                       aria-current={i === index}
                       className={cn(
                         "relative h-16 w-16 shrink-0 overflow-hidden border transition-colors duration-300",
-                        i === index ? "border-gold" : "border-white/15 hover:border-gold/50",
+                        i === index ? "border-forest" : "border-white/15 hover:border-forest/50",
                       )}
                     >
                       <Image src={src} alt="" fill sizes="80px" className="object-cover" />
@@ -236,7 +236,7 @@ export function ArtworkModal({
                     type="button"
                     onClick={onClose}
                     aria-label="Close"
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink transition-colors duration-500 hover:border-gold/60 hover:text-gold"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line text-ink transition-colors duration-500 hover:border-forest/60 hover:text-forest"
                   >
                     <X size={15} />
                   </button>
@@ -250,7 +250,7 @@ export function ArtworkModal({
                   {artwork.title}
                 </h2>
                 {artwork.title_arabic && (
-                  <p dir="rtl" className="mt-2 font-arabic text-2xl text-gold">
+                  <p dir="rtl" className="mt-2 font-arabic text-2xl text-forest">
                     {artwork.title_arabic}
                   </p>
                 )}
@@ -268,7 +268,7 @@ export function ArtworkModal({
                     ["Year of completion", artwork.year],
                   ].map(([label, value]) => (
                     <div key={label} className="grid grid-cols-[130px_1fr] gap-4 py-4">
-                      <dt className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted">{label}</dt>
+                      <dt className="text-xs text-muted">{label}</dt>
                       <dd className="text-[13.5px] leading-relaxed text-ink-soft">{value}</dd>
                     </div>
                   ))}
@@ -277,7 +277,7 @@ export function ArtworkModal({
 
               <div className="mt-10 space-y-4">
                 <AcquireButton href={waHref} size="lg" variant="solid" className="w-full rounded-full" />
-                <p className="text-center font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
+                <p className="text-center text-xs text-muted">
                   Opens WhatsApp · {contact.whatsappDisplay} · No account required
                 </p>
                 <div className="gold-rule" />

@@ -17,14 +17,14 @@ export function ThemeToggle({ className }: { className?: string }) {
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       title={isDark ? "Light mode" : "Night mode"}
       className={cn(
-        "group relative inline-flex h-9 w-[62px] shrink-0 items-center rounded-full border border-gold/30 px-1 transition-colors duration-500",
-        "bg-canvas-2/60 hover:border-gold/60",
-        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gold/60",
+        "group relative inline-flex h-9 w-[62px] shrink-0 items-center rounded-full border border-forest/30 px-1 transition-colors duration-500",
+        "bg-canvas-2/60 hover:border-forest/60",
+        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-forest/60",
         className,
       )}
     >
       <span aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-full">
-        <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-gold/70">✦</span>
+        <span className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-forest/70">✦</span>
         <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] text-muted/70">☾</span>
       </span>
 
@@ -33,7 +33,7 @@ export function ThemeToggle({ className }: { className?: string }) {
         transition={{ type: "spring", stiffness: 520, damping: 34 }}
         className={cn(
           "relative z-10 flex h-7 w-7 items-center justify-center rounded-full shadow-whisper",
-          isDark ? "ml-auto bg-gradient-to-br from-gold-bright to-gold-deep" : "mr-auto bg-ink text-canvas",
+          isDark ? "ml-auto bg-gradient-to-br from-lime to-forest" : "mr-auto bg-ink text-canvas",
         )}
       >
         <motion.span

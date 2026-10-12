@@ -26,37 +26,8 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
     <section
       ref={ref}
       id="top"
-      className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden pb-16 pt-32 sm:pt-40 lg:pb-24"
+      className="relative flex min-h-[92svh] flex-col justify-center overflow-hidden pb-16 pt-24 sm:pt-28 lg:pb-20"
     >
-      {/* drifting background calligraphic strokes */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-        <svg
-          viewBox="0 0 1200 800"
-          className="absolute -left-[12%] top-[6%] h-[70%] w-[70%] text-gold/[0.07] animate-drift"
-          fill="none"
-        >
-          <path
-            d="M40 620C180 520 240 300 420 250c150-42 250 60 340 20 90-40 120-160 260-170"
-            stroke="currentColor"
-            strokeWidth="26"
-            strokeLinecap="round"
-          />
-          <path d="M300 640c90-120 60-300 210-340 130-34 220 40 300 10" stroke="currentColor" strokeWidth="14" strokeLinecap="round" />
-        </svg>
-        <svg
-          viewBox="0 0 1200 800"
-          className="absolute -right-[16%] bottom-[-8%] h-[62%] w-[62%] text-ink/[0.045] dark:text-gold/[0.05] animate-drift [animation-delay:-8s]"
-          fill="none"
-        >
-          <path
-            d="M1100 120C980 260 900 420 720 470 560 515 470 430 360 470 250 510 200 640 60 680"
-            stroke="currentColor"
-            strokeWidth="30"
-            strokeLinecap="round"
-          />
-        </svg>
-      </div>
-
       <div className="shell relative grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
         <motion.div style={{ y: copyY }} className="relative z-10">
           <motion.div
@@ -68,14 +39,14 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
             {hero.eyebrow ? (
               <>
                 <span className="eyebrow">{hero.eyebrow}</span>
-                <span className="h-px w-8 bg-gold/50" />
+                <span className="h-px w-8 bg-forest/50" />
               </>
             ) : null}
             <StatusBadge status="Available" size="sm" />
           </motion.div>
 
-          <h1 className="mt-7 font-display text-display-xl text-ink">
-            <SplitLines lines={heroLines} lineClassName="italic" delay={0} />
+          <h1 className="mt-6 font-display text-display-xl text-ink">
+            <SplitLines lines={heroLines} lineClassName="" delay={0} />
           </h1>
 
           <motion.p
@@ -95,7 +66,7 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
           >
             <Link
               href="#works"
-              className="btn-ink h-[54px] rounded-full px-8 font-mono text-[11px] uppercase tracking-[0.24em]"
+              className="btn-ink h-[52px] rounded-full px-7 text-[15px]"
             >
               <span>{hero.ctaLabel}</span>
             </Link>
@@ -118,7 +89,7 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
             >
               {hero.stats.map((stat) => (
                 <div key={stat.label}>
-                  <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-muted">{stat.label}</p>
+                  <p className="font-sans text-xs text-muted">{stat.label}</p>
                   <p className="mt-1 font-display text-lg text-ink">{stat.value}</p>
                 </div>
               ))}
@@ -137,9 +108,9 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
               <div className="relative">
                 <span
                   aria-hidden
-                  className="absolute -inset-6 rounded-sm bg-gold/12 blur-3xl"
+                  className="absolute -inset-6 rounded-3xl bg-forest/10 blur-3xl"
                 />
-                <div className="relative aspect-[4/5] overflow-hidden border border-line bg-canvas-2 shadow-gallery">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-line bg-canvas-2">
                   <Image
                     src={heroImage}
                     alt={artwork ? `${artwork.title} — calligraphy by Muhsin` : "Calligraphy by Muhsin"}
@@ -150,11 +121,11 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
                   />
                   <span
                     aria-hidden
-                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/35 via-transparent to-transparent"
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent"
                   />
                   <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5">
                     <div>
-                      <p className="font-mono text-[9px] uppercase tracking-[0.24em] text-white/70">
+                      <p className="font-sans text-[9px] tracking-wide text-white/70">
                         Featured · {artwork?.script_style ?? "Thuluth"}
                       </p>
                       <p className="mt-1 font-display text-xl text-white">
@@ -168,13 +139,13 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
                 </div>
 
                 {/* floating plaque */}
-                <div className="glass absolute -bottom-8 -left-6 hidden w-[248px] rounded-sm p-5 sm:block">
+                <div className="glass absolute -bottom-8 -left-6 hidden w-[248px] rounded-2xl p-5 sm:block">
                   <p className="eyebrow">{hero.plaqueEyebrow}</p>
                   <p className="mt-2 font-display text-[22px] leading-tight text-ink">
                     {hero.plaqueTitle}
                   </p>
                   <div className="gold-rule my-3" />
-                  <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
+                  <p className="font-sans text-xs text-muted">
                     {hero.plaqueNote}
                   </p>
                 </div>
@@ -190,12 +161,12 @@ export function Hero({ artwork }: { artwork: Artwork | null }) {
         transition={{ delay: 1.6, duration: 1 }}
         className="shell mt-20 hidden items-center gap-3 sm:flex"
       >
-        <span className="font-mono text-[9px] uppercase tracking-[0.24em] text-muted">Scroll</span>
+        <span className="font-sans text-xs text-muted">Scroll</span>
         <motion.span
           aria-hidden
           animate={{ y: [0, 10, 0] }}
           transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut" }}
-          className="block h-8 w-px bg-gradient-to-b from-gold to-transparent"
+          className="block h-8 w-px bg-gradient-to-b from-forest to-transparent"
         />
       </motion.div>
     </section>

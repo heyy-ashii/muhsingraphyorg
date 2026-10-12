@@ -16,18 +16,18 @@ function Separator({ kind }: { kind: TickerSeparator }) {
   if (kind === "dot") {
     return (
       <span aria-hidden className="mx-8 inline-flex shrink-0 items-center">
-        <span className="h-1.5 w-1.5 rounded-full bg-gold" />
+        <span className="h-1.5 w-1.5 rounded-full bg-forest" />
       </span>
     );
   }
 
   if (kind === "bar") {
-    return <span aria-hidden className="mx-8 inline-block h-4 w-px shrink-0 bg-gold/70" />;
+    return <span aria-hidden className="mx-8 inline-block h-4 w-px shrink-0 bg-forest/70" />;
   }
 
   return (
     <span aria-hidden className="mx-8 inline-flex shrink-0 items-center">
-      <svg width="9" height="9" viewBox="0 0 10 10" className="text-gold">
+      <svg width="9" height="9" viewBox="0 0 10 10" className="text-forest">
         <path d="M5 0l5 5-5 5-5-5z" fill="currentColor" />
       </svg>
     </span>
@@ -46,7 +46,7 @@ export function Ticker() {
   return (
     <section
       aria-label="Disciplines and materials"
-      className="relative border-y border-line bg-canvas-2/40 py-6 sm:py-7"
+      className="relative border-y border-line bg-forest py-4 text-lime"
     >
       <div className="edge-fade overflow-hidden">
         <div className={cn("flex w-max items-center will-change-transform", SPEED_CLASS[speed])}>
@@ -54,7 +54,7 @@ export function Ticker() {
             <div key={copy} className="flex shrink-0 items-center" aria-hidden={copy === 1}>
               {loop.map((item, i) => (
                 <span key={`${copy}-${item}-${i}`} className="flex shrink-0 items-center">
-                  <span className="whitespace-nowrap font-display text-[clamp(1.1rem,2.4vw,1.9rem)] uppercase tracking-[0.18em] text-ink-soft">
+                  <span className="whitespace-nowrap font-display text-[clamp(1.1rem,2.4vw,1.9rem)] tracking-wide text-ink-soft">
                     {item}
                   </span>
                   <Separator kind={separator} />
