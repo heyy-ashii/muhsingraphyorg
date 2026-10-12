@@ -9,7 +9,6 @@ import { SECTION_INDEX } from "@/lib/content/defaults";
 import { SectionHeading } from "./section-heading";
 import { ArtworkCard } from "./artwork-card";
 import { ArtworkModal } from "./artwork-modal";
-import { MagneticCursor } from "./magnetic-cursor";
 
 /**
  * Staggered editorial layout: each piece receives a column span and vertical
@@ -44,7 +43,7 @@ export function WorksPavilion({ artworks }: { artworks: Artwork[] }) {
           lines={works.lines}
           description={works.description}
           action={
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted">
+            <p className="text-sm text-muted">
               {pad(filtered.length, 2)} {filtered.length === 1 ? "piece" : "pieces"} on view
             </p>
           }
@@ -59,16 +58,16 @@ export function WorksPavilion({ artworks }: { artworks: Artwork[] }) {
                 type="button"
                 onClick={() => setActive(cat)}
                 className={cn(
-                  "relative overflow-hidden rounded-full border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.18em] transition-colors duration-500",
+                  "relative overflow-hidden rounded-full border px-4 py-2 text-sm transition-colors duration-500",
                   isActive
-                    ? "border-gold/60 text-gold-deep dark:text-gold"
-                    : "border-line text-muted hover:border-gold/35 hover:text-ink",
+                    ? "border-forest/60 text-forest dark:text-forest"
+                    : "border-line text-muted hover:border-forest/35 hover:text-ink",
                 )}
               >
                 {isActive && (
                   <motion.span
                     layoutId="category-pill"
-                    className="absolute inset-0 bg-gold/10"
+                    className="absolute inset-0 bg-forest/10"
                     transition={{ type: "spring", stiffness: 380, damping: 32 }}
                   />
                 )}
@@ -106,7 +105,6 @@ export function WorksPavilion({ artworks }: { artworks: Artwork[] }) {
         )}
       </div>
 
-      <MagneticCursor />
       <ArtworkModal artwork={selected} onClose={() => setSelected(null)} />
     </section>
   );

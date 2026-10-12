@@ -69,19 +69,19 @@ export function CommissionDesk() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                  className="flex min-h-[440px] flex-col items-center justify-center border border-gold/35 bg-surface p-10 text-center"
+                  className="flex min-h-[440px] flex-col items-center justify-center rounded-3xl border border-forest/30 bg-surface p-10 text-center"
                 >
-                  <span className="flex h-14 w-14 items-center justify-center rounded-full border border-gold/50 text-gold">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-full border border-forest/50 text-forest">
                     <Check size={22} />
                   </span>
-                  <h3 className="mt-6 font-display text-3xl text-ink">{commissions.successTitle}</h3>
+                  <h3 className="mt-6 font-display text-2xl font-semibold text-ink">{commissions.successTitle}</h3>
                   <p className="mt-3 max-w-[40ch] text-[15px] leading-relaxed text-muted">
                     {commissions.successBody}
                   </p>
                   <button
                     type="button"
                     onClick={() => setState("idle")}
-                    className="link-underline mt-8 font-mono text-[10px] uppercase tracking-[0.22em] text-ink"
+                    className="link-underline mt-8 text-sm font-medium text-ink"
                   >
                     Submit another enquiry
                   </button>
@@ -93,7 +93,7 @@ export function CommissionDesk() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   onSubmit={onSubmit}
-                  className="space-y-9 border border-line bg-surface p-7 sm:p-10"
+                  className="space-y-8 rounded-3xl border border-line bg-surface p-7 sm:p-9"
                 >
                   <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
                     <label className="block">
@@ -145,7 +145,7 @@ export function CommissionDesk() {
                   </label>
 
                   {error && (
-                    <p role="alert" className="border border-red-500/30 bg-red-500/5 px-4 py-3 font-mono text-[10px] uppercase tracking-[0.16em] text-red-600 dark:text-red-400">
+                    <p role="alert" className="border border-red-500/30 bg-red-500/5 px-4 py-3 text-xs text-coral">
                       {error}
                     </p>
                   )}
@@ -154,7 +154,7 @@ export function CommissionDesk() {
                     <button
                       type="submit"
                       disabled={state === "sending"}
-                      className="btn-ink h-[54px] min-w-[210px] rounded-full px-8 font-mono text-[11px] uppercase tracking-[0.24em] disabled:opacity-60"
+                      className="btn-ink h-[52px] min-w-[200px] rounded-full px-7 text-[15px] disabled:opacity-60"
                     >
                       {state === "sending" ? (
                         <>
@@ -165,7 +165,7 @@ export function CommissionDesk() {
                         <span>Submit Enquiry</span>
                       )}
                     </button>
-                    <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
+                    <p className="text-xs text-muted">
                       Held in confidence · No account required
                     </p>
                   </div>
@@ -177,13 +177,9 @@ export function CommissionDesk() {
           {/* ── direct channels ──────────────────────────────── */}
           <div className="flex flex-col gap-6">
             <Reveal>
-              <div className="relative overflow-hidden border border-gold/30 bg-surface p-7 sm:p-9">
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gold/10 blur-3xl"
-                />
+              <div className="relative overflow-hidden rounded-2xl border border-forest/30 bg-surface p-7 sm:p-8">
                 <p className="eyebrow">Direct line</p>
-                <p className="mt-4 font-display text-[clamp(2rem,3.6vw,2.8rem)] leading-none text-ink">
+                <p className="mt-4 font-display text-3xl font-semibold leading-none text-ink">
                   {contact.whatsappDisplay}
                 </p>
                 <p className="mt-3 text-[14px] leading-relaxed text-muted">{commissions.directNote}</p>
@@ -197,7 +193,7 @@ export function CommissionDesk() {
                   />
                   <a
                     href={`mailto:${contact.email}`}
-                    className="btn-gold h-11 rounded-full px-6 font-mono text-[11px] uppercase tracking-[0.22em]"
+                    className="btn-gold h-11 rounded-full px-6 text-sm"
                   >
                     <span>Email the atelier</span>
                   </a>
@@ -210,26 +206,26 @@ export function CommissionDesk() {
                 href={contact.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center justify-between border border-line bg-surface p-7 transition-colors duration-700 hover:border-gold/40 sm:p-9"
+                className="group flex items-center justify-between rounded-2xl border border-line bg-surface p-7 transition-colors duration-300 hover:border-forest/40 sm:p-8"
               >
                 <span className="flex items-center gap-5">
-                  <InstagramIcon className="text-gold" />
+                  <InstagramIcon className="text-forest" />
                   <span>
-                    <span className="block font-display text-2xl text-ink">{contact.instagramHandle}</span>
-                    <span className="mt-1 block font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
+                    <span className="block font-display text-xl font-semibold text-ink">{contact.instagramHandle}</span>
+                    <span className="mt-1 block text-xs text-muted">
                       Studio journal & works in progress
                     </span>
                   </span>
                 </span>
                 <ArrowUpRight
                   size={20}
-                  className="text-muted transition-all duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-gold"
+                  className="text-muted transition-all duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-forest"
                 />
               </a>
             </Reveal>
 
             <Reveal delay={0.16}>
-              <div className="border border-line bg-surface p-7 sm:p-9">
+              <div className="rounded-2xl border border-line bg-surface p-7 sm:p-8">
                 <p className="eyebrow">Studio & representation</p>
                 <dl className="mt-5 space-y-4 text-[14px] leading-relaxed text-ink-soft">
                   <div className="flex justify-between gap-6 border-b border-line pb-3">
@@ -246,8 +242,8 @@ export function CommissionDesk() {
                   </div>
                 </dl>
                 <div className="mt-6 flex items-center gap-3 border-t border-line pt-5">
-                  <WhatsAppIcon className="text-gold" />
-                  <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
+                  <WhatsAppIcon className="text-forest" />
+                  <p className="text-xs text-muted">
                     {commissions.shippingNote}
                   </p>
                 </div>

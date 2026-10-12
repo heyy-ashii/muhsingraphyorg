@@ -37,9 +37,9 @@ interface AcquireButtonProps {
 }
 
 const SIZES = {
-  sm: "h-9 px-4 text-[10px] tracking-[0.2em]",
-  md: "h-11 px-6 text-[11px] tracking-[0.22em]",
-  lg: "h-[54px] px-8 text-[12px] tracking-[0.24em]",
+  sm: "h-9 px-4 text-xs",
+  md: "h-11 px-6 text-sm",
+  lg: "h-[52px] px-7 text-[15px]",
 } as const;
 
 /**
@@ -50,7 +50,7 @@ export function AcquireButton({
   href,
   label = "Acquire via WhatsApp",
   className,
-  variant = "outline",
+  variant = "solid",
   size = "md",
   onClick,
 }: AcquireButtonProps) {
@@ -62,17 +62,16 @@ export function AcquireButton({
       onClick={onClick}
       data-whatsapp="true"
       className={cn(
-        "group/wa inline-flex items-center justify-center gap-2.5 font-mono uppercase transition-all duration-500",
+        "group/wa inline-flex items-center justify-center gap-2.5 rounded-full font-sans font-semibold transition-all duration-300",
         SIZES[size],
         variant === "outline" && "btn-gold",
-        variant === "solid" &&
-          "bg-gradient-to-r from-gold-deep to-gold-bright text-white hover:shadow-gilding dark:text-[#0A0A0B]",
+        variant === "solid" && "btn-ink",
         variant === "ghost" &&
-          "border border-transparent text-muted hover:border-gold/40 hover:text-gold",
+          "border border-transparent text-muted hover:border-forest/40 hover:text-forest",
         className,
       )}
     >
-      <WhatsAppIcon className="shrink-0 transition-transform duration-500 group-hover/wa:scale-110" />
+      <WhatsAppIcon className="shrink-0 transition-transform duration-300 group-hover/wa:scale-110" />
       <span>{label}</span>
     </a>
   );

@@ -7,7 +7,6 @@ import { cn, pad } from "@/lib/utils";
 import { useSiteContent } from "@/lib/content/context";
 import { ArtworkCard } from "./artwork-card";
 import { ArtworkModal } from "./artwork-modal";
-import { MagneticCursor } from "./magnetic-cursor";
 
 const LAYOUT = [
   { col: "lg:col-span-7", offset: "lg:mt-0", aspect: "aspect-[4/5]" },
@@ -40,16 +39,14 @@ export function WorksIndex({ artworks }: { artworks: Artwork[] }) {
               type="button"
               onClick={() => setActive(cat)}
               className={cn(
-                "relative overflow-hidden rounded-full border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.18em] transition-colors duration-500",
-                isActive
-                  ? "border-gold/60 text-gold-deep dark:text-gold"
-                  : "border-line text-muted hover:border-gold/35 hover:text-ink",
+                "relative overflow-hidden rounded-full border px-4 py-2 text-sm font-medium transition-colors duration-300",
+                isActive ? "border-forest text-forest" : "border-line text-muted hover:border-forest/40 hover:text-ink",
               )}
             >
               {isActive && (
                 <motion.span
                   layoutId="index-category-pill"
-                  className="absolute inset-0 bg-gold/10"
+                  className="absolute inset-0 bg-lime/40"
                   transition={{ type: "spring", stiffness: 380, damping: 32 }}
                 />
               )}
@@ -57,7 +54,7 @@ export function WorksIndex({ artworks }: { artworks: Artwork[] }) {
             </button>
           );
         })}
-        <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.22em] text-muted">
+        <span className="ml-auto text-sm text-muted">
           {pad(filtered.length, 2)} {filtered.length === 1 ? "piece" : "pieces"}
         </span>
       </div>
@@ -92,7 +89,6 @@ export function WorksIndex({ artworks }: { artworks: Artwork[] }) {
         </p>
       )}
 
-      <MagneticCursor />
       <ArtworkModal artwork={selected} onClose={() => setSelected(null)} />
     </div>
   );

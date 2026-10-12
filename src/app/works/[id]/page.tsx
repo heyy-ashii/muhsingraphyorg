@@ -84,13 +84,13 @@ export default async function ArtworkPage({ params }: { params: Promise<{ id: st
   return (
     <>
       <Navbar />
-      <main id="main" className="pt-32 sm:pt-40">
+      <main id="main" className="pt-24 sm:pt-28">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
         <div className="shell">
           <Link
             href="/works"
-            className="link-underline inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.22em] text-muted transition-colors hover:text-gold"
+            className="link-underline inline-flex items-center gap-2 text-sm font-medium text-muted transition-colors hover:text-forest"
           >
             <ArrowLeft size={11} />
             Back to the archive
@@ -106,11 +106,11 @@ export default async function ArtworkPage({ params }: { params: Promise<{ id: st
                 <StatusBadge status={artwork.status} />
                 <h1 className="mt-6 font-display text-display-md text-ink">{artwork.title}</h1>
                 {artwork.title_arabic && (
-                  <p dir="rtl" className="mt-3 font-arabic text-3xl text-gold">
+                  <p dir="rtl" className="mt-3 font-arabic text-3xl text-forest">
                     {artwork.title_arabic}
                   </p>
                 )}
-                <p className="mt-6 text-pretty text-[16px] leading-relaxed text-ink-soft">
+                <p className="mt-6 text-pretty text-base leading-relaxed text-ink-soft">
                   {artwork.description ??
                     "A singular composition from the atelier — hand-inked, gilded and prepared for archival display."}
                 </p>
@@ -120,8 +120,8 @@ export default async function ArtworkPage({ params }: { params: Promise<{ id: st
                 <dl className="mt-9 divide-y divide-line border-y border-line">
                   {specs.map(([label, value]) => (
                     <div key={label} className="grid grid-cols-[130px_1fr] gap-4 py-4">
-                      <dt className="font-mono text-[9px] uppercase tracking-[0.2em] text-muted">{label}</dt>
-                      <dd className="text-[13.5px] leading-relaxed text-ink-soft">{value}</dd>
+                      <dt className="text-sm text-muted">{label}</dt>
+                      <dd className="text-sm font-medium leading-relaxed text-ink-soft">{value}</dd>
                     </div>
                   ))}
                 </dl>
@@ -130,17 +130,17 @@ export default async function ArtworkPage({ params }: { params: Promise<{ id: st
               <Reveal delay={0.16}>
                 <div className="mt-9 space-y-4">
                   <AcquireButton href={waHref} size="lg" variant="solid" className="w-full rounded-full" />
-                  <p className="text-center font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
+                  <p className="text-center text-xs text-muted">
                                           Opens WhatsApp · {content.contact.whatsappDisplay} · No account required
                   </p>
                   <div className="gold-rule" />
-                  <p className="text-[12.5px] leading-relaxed text-muted">
+                  <p className="text-sm leading-relaxed text-muted">
                     Accompanied by a signed certificate of authenticity and an archival provenance
                     dossier. Insured worldwide shipping arranged with the atelier.
                   </p>
                   <a
                     href={`${SITE.url}#commissions`}
-                    className="link-underline inline-flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.2em] text-ink transition-colors hover:text-gold"
+                    className="link-underline inline-flex items-center gap-2 text-sm font-medium text-ink transition-colors hover:text-forest"
                   >
                     Commission a related piece
                     <ArrowUpRight size={12} />
@@ -152,9 +152,9 @@ export default async function ArtworkPage({ params }: { params: Promise<{ id: st
         </div>
 
         {related.length > 0 && (
-          <section className="shell mt-28 border-t border-line pt-16">
+          <section className="shell mt-24 border-t border-line pt-16">
             <p className="eyebrow">Continue through the gallery</p>
-            <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((a, i) => (
                 <ArtworkCard key={a.id} artwork={a} index={i} aspect="aspect-[4/5]" />
               ))}

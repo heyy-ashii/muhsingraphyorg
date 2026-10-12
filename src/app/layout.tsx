@@ -1,37 +1,29 @@
 import type { Metadata, Viewport } from "next";
-import {
-  Amiri,
-  Cinzel,
-  Cormorant_Garamond,
-  JetBrains_Mono,
-  Manrope,
-} from "next/font/google";
+import { Amiri, Poppins } from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/lib/site";
 import { getSiteContent } from "@/lib/content/load";
 import { SiteContentProvider } from "@/lib/content/context";
 import { ThemeProvider } from "@/components/site/theme-provider";
 import { SmoothScroll } from "@/components/site/smooth-scroll";
-import { GrainOverlay } from "@/components/site/grain-overlay";
 
-const display = Cormorant_Garamond({
+const sans = Poppins({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  variable: "--font-display",
-  display: "swap",
-});
-
-const sans = Manrope({
-  subsets: ["latin"],
-  weight: ["200", "300", "400", "500", "600", "700"],
   variable: "--font-sans",
   display: "swap",
 });
 
-const mono = JetBrains_Mono({
+const display = Poppins({
   subsets: ["latin"],
-  weight: ["300", "400", "500"],
+  weight: ["500", "600", "700"],
+  variable: "--font-display",
+  display: "swap",
+});
+
+const mono = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
   variable: "--font-mono",
   display: "swap",
 });
@@ -40,13 +32,6 @@ const arabic = Amiri({
   subsets: ["arabic"],
   weight: ["400", "700"],
   variable: "--font-arabic",
-  display: "swap",
-});
-
-const cinzel = Cinzel({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-cinzel",
   display: "swap",
 });
 
@@ -93,15 +78,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#FAF8F5" },
-    { media: "(prefers-color-scheme: dark)", color: "#0A0A0B" },
-  ],
+  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#F5F4F0" }],
   width: "device-width",
   initialScale: 1,
 };
-
-const themeBootstrap = `(function(){try{var t=localStorage.getItem('mhg-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}var r=document.documentElement;if(t==='dark'){r.classList.add('dark');r.style.colorScheme='dark';}else{r.classList.remove('dark');r.style.colorScheme='light';}}catch(e){}})();`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const content = await getSiteContent();
@@ -109,18 +89,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${display.variable} ${sans.variable} ${mono.variable} ${arabic.variable} ${cinzel.variable}`}
+      className={`${display.variable} ${sans.variable} ${mono.variable} ${arabic.variable}`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
-      </head>
       <body className="min-h-dvh bg-canvas text-ink antialiased">
         <SiteContentProvider content={content}>
           <ThemeProvider>
             <SmoothScroll>{children}</SmoothScroll>
           </ThemeProvider>
         </SiteContentProvider>
-        <GrainOverlay />
       </body>
     </html>
   );
